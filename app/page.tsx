@@ -177,7 +177,7 @@ export default function Home() {
         { sel: ".collection-wrap", color: "#fbf3dc" },  // cream
         { sel: ".comparison", color: "#0f5132" },       // forest
         { sel: ".testimonial", color: "#fbf3dc" },      // cream
-        { sel: ".subscribe", color: "#1948e8" },        // blue
+        { sel: ".subscribe", color: "#2540ad" },        // deep indigo
         { sel: ".press", color: "#ffffff" },            // white
         { sel: ".footer", color: "#111111" },           // black
       ];
@@ -215,6 +215,16 @@ export default function Home() {
 
   return (
     <div ref={root} suppressHydrationWarning>
+      {/* Skip link for keyboard users */}
+      <a href="#main" className="skip-link">Skip to content</a>
+
+      {/* ============ PROMO BAR ============ */}
+      <div className="promo-bar" role="region" aria-label="Promotion">
+        <span aria-hidden="true">✦</span>
+        <span>Free shipping on orders $30+ · Buy 2, get 1 free</span>
+        <span aria-hidden="true">✦</span>
+      </div>
+
       {/* ============ NAV ============ */}
       <nav className="nav-bar">
         <div className="nav-inner">
@@ -222,41 +232,66 @@ export default function Home() {
             CASEVA
           </a>
           <div className="nav-right">
-            <button className="shop-btn">Shop</button>
-            <a className="nav-link" href="#benefits">Learn</a>
-            <a className="nav-link" href="#subscribe">Subscribe</a>
+            <a className="nav-link" href="#collection">Shop</a>
+            <a className="nav-link" href="#collection">Floral</a>
+            <a className="nav-link" href="#collection">Clear</a>
+            <a className="nav-link" href="#collection">MagSafe</a>
+            <button className="icon-btn" aria-label="Search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </button>
             <button className="icon-btn" aria-label="Account">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="10" />
                 <circle cx="12" cy="10" r="3" />
                 <path d="M7 20.66a8 8 0 0 1 10 0" />
               </svg>
             </button>
-            <button className="icon-btn" aria-label="Cart">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <button className="icon-btn cart-btn" aria-label="Cart, 2 items">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="9" cy="21" r="1" />
                 <circle cx="20" cy="21" r="1" />
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
               </svg>
+              <span className="cart-badge" aria-hidden="true">2</span>
             </button>
           </div>
         </div>
       </nav>
 
       {/* ============ HERO ============ */}
-      <section className="hero" aria-label="Hero">
+      <section id="main" className="hero" aria-label="Hero">
         <div className="hero-pattern" aria-hidden="true" />
 
         <div className="hero-content">
-          <h1 className="headline left-align">Say hello to<br/>your new<br/>favorite designs</h1>
+          <h1 className="headline left-align">
+            Phone cases pretty enough<br/>to keep on.
+          </h1>
+
+          <p className="hero-sub">
+            <strong>$24</strong> and up. Fits every iPhone 12 to 16 Pro Max.
+            <br/>
+            We ship free.
+          </p>
+
           <div className="cta-wrap left-align">
             <a className="cta" href="#collection">
-              Shop Now
+              Shop the Collection
               <svg className="cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </a>
           </div>
+
+          <ul className="hero-trust-strip" aria-label="Buyer reassurance">
+            <li>Free shipping</li>
+            <li aria-hidden="true">·</li>
+            <li>30-day returns</li>
+            <li aria-hidden="true">·</li>
+            <li>1-year warranty</li>
+          </ul>
         </div>
 
         <div className="cases" suppressHydrationWarning>
