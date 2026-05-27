@@ -1,12 +1,30 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+const PHONE_MODELS = [
+  "iPhone 16 Pro Max",
+  "iPhone 16 Pro",
+  "iPhone 16 Plus",
+  "iPhone 16",
+  "iPhone 15 Pro Max",
+  "iPhone 15 Pro",
+  "iPhone 15 Plus",
+  "iPhone 15",
+  "iPhone 14 Pro Max",
+  "iPhone 14 Pro",
+  "iPhone 14",
+  "iPhone 13 Pro",
+  "iPhone 13",
+];
+const DEFAULT_MODEL = "iPhone 16 Pro";
+const MODEL_STORAGE_KEY = "caseva-iphone-model";
 
 const heroCases = [
   { src: "/tulip-case-v2.png", alt: "Tulip pattern case", className: "case case-fan-0", rotate: -30, x: -200, y: 60, priority: true },
@@ -42,36 +60,113 @@ const reviews = [
 
 export default function Home() {
   const root = useRef<HTMLDivElement>(null);
+  const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODEL);
+  const [modelOpen, setModelOpen] = useState(false);
+  const modelMenuRef = useRef<HTMLDivElement>(null);
+
+  // Hydrate from localStorage after mount (avoids SSR mismatch)
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(MODEL_STORAGE_KEY);
+      if (saved && PHONE_MODELS.includes(saved)) setSelectedModel(saved);
+    } catch {
+      /* localStorage unavailable */
+    }
+  }, []);
+
+  // Close dropdown on outside click + Escape
+  useEffect(() => {
+    if (!modelOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (modelMenuRef.current && !modelMenuRef.current.contains(e.target as Node)) {
+        setModelOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setModelOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [modelOpen]);
+
+  const handleModelSelect = (model: string) => {
+    setSelectedModel(model);
+    setModelOpen(false);
+    try {
+      window.localStorage.setItem(MODEL_STORAGE_KEY, model);
+    } catch {
+      /* ignore */
+    }
+    document.querySelector("#collection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   useGSAP(
     () => {
-      // ----- HERO: strong directional parallax for each case -----
-      gsap.utils.toArray<HTMLElement>(".case").forEach((el) => {
-        const rotate = Number(el.dataset.rotate || 0);
-        const x = Number(el.dataset.x || 0);
-        const y = Number(el.dataset.y || 0);
-        gsap.set(el, { rotate });
-        gsap.to(el, {
-          x,
-          y,
-          rotate: rotate * 1.5,
+      // ============ HERO ANIMATIONS (reduced-motion-aware) ============
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        // Set initial rotation for each case
+        gsap.utils.toArray<HTMLElement>(".case").forEach((el) => {
+          gsap.set(el, { rotate: Number(el.dataset.rotate || 0) });
+        });
+
+        // ----- HERO ENTRANCE: cases fan in from center outward -----
+        gsap.from(".case", {
+          opacity: 0,
+          y: 40,
+          scale: 0.95,
+          duration: 0.7,
+          ease: "power3.out",
+          stagger: { each: 0.08, from: "center" },
+          delay: 0.1,
+        });
+
+        // ----- HERO ENTRANCE: text block fades up -----
+        gsap.from(".hero-content > *", {
+          opacity: 0,
+          y: 24,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: "power3.out",
+          delay: 0.15,
+        });
+
+        // ----- HERO PARALLAX: cases drift outward on scroll -----
+        gsap.utils.toArray<HTMLElement>(".case").forEach((el) => {
+          gsap.to(el, {
+            x: Number(el.dataset.x || 0),
+            y: Number(el.dataset.y || 0),
+            rotate: Number(el.dataset.rotate || 0) * 1.5,
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".hero",
+              start: "top top",
+              end: "bottom top",
+              scrub: 0.6,
+            },
+          });
+        });
+
+        // ----- HERO PARALLAX: text drifts up + fades on scroll -----
+        gsap.to(".hero-content", {
+          y: -150,
+          opacity: 0,
           ease: "none",
-          scrollTrigger: {
-            trigger: ".hero",
-            start: "top top",
-            end: "bottom top",
-            scrub: 0.6,
-          },
+          scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 0.6 },
         });
       });
 
-      const heroTl = gsap.timeline({
-        scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 0.6 },
+      // Reduced-motion fallback: set final rotation only, no animation
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.utils.toArray<HTMLElement>(".case").forEach((el) => {
+          gsap.set(el, { rotate: Number(el.dataset.rotate || 0) });
+        });
       });
-
-      // Layered text/CTA drift at different speeds via same timeline
-      heroTl
-        .to(".hero-content", { y: -150, opacity: 0 }, 0);
 
       // ----- Reveal-on-scroll for headlines and rows -----
       gsap.utils.toArray<HTMLElement>(".reveal").forEach((el) => {
@@ -276,6 +371,50 @@ export default function Home() {
             We ship free.
           </p>
 
+          <div className="model-selector" ref={modelMenuRef}>
+            <button
+              type="button"
+              className="model-trigger"
+              aria-haspopup="listbox"
+              aria-expanded={modelOpen}
+              aria-label={`Shop for ${selectedModel}. Click to change phone model.`}
+              onClick={() => setModelOpen((v) => !v)}
+            >
+              <svg className="model-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="6" y="2" width="12" height="20" rx="2" />
+                <line x1="11" y1="18" x2="13" y2="18" />
+              </svg>
+              <span className="model-label">
+                <span className="model-prefix">Shop for</span>
+                <span className="model-value">{selectedModel}</span>
+              </span>
+              <svg className={`model-chevron ${modelOpen ? "is-open" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            {modelOpen && (
+              <ul className="model-menu" role="listbox" aria-label="iPhone models">
+                {PHONE_MODELS.map((m) => (
+                  <li key={m} role="option" aria-selected={m === selectedModel}>
+                    <button
+                      type="button"
+                      className={`model-option ${m === selectedModel ? "is-selected" : ""}`}
+                      onClick={() => handleModelSelect(m)}
+                    >
+                      {m}
+                      {m === selectedModel && (
+                        <svg className="model-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           <div className="cta-wrap left-align">
             <a className="cta" href="#collection">
               Shop the Collection
@@ -307,6 +446,7 @@ export default function Home() {
               width={300}
               height={450}
               priority={c.priority}
+              draggable={false}
             />
           ))}
         </div>
