@@ -26,6 +26,13 @@ const PHONE_MODELS = [
 const DEFAULT_MODEL = "iPhone 16 Pro";
 const MODEL_STORAGE_KEY = "caseva-iphone-model";
 
+// ============ INTRO EXIT STYLE ============
+// Change this to pick which exit you want:
+//   "curtain" → top half slides UP, bottom half slides DOWN (classic film-studio bumper)
+//   "wipe"    → entire overlay slides UP off-screen (Apple/Stripe modern feel)
+//   "iris"    → growing transparent circle in the center reveals hero through the overlay
+const EXIT_STYLE: "curtain" | "wipe" | "iris" = "iris";
+
 const heroCases = [
   { src: "/tulip-case-v2.png", alt: "Tulip pattern case", className: "case case-fan-0", rotate: -30, x: -200, y: 60, priority: true },
   { src: "/pink-floral-case-v2.png", alt: "Pink floral case", className: "case case-fan-1", rotate: -15, x: -100, y: 30, priority: true },
@@ -154,7 +161,7 @@ export default function Home() {
 
           const intro = gsap.timeline({
             onComplete: () => {
-              try { window.sessionStorage.setItem("caseva-intro-played", "true"); } catch {}
+              try { window.sessionStorage.setItem("caseva-intro-played", "true"); } catch { }
               if (overlay) {
                 overlay.style.display = "none";
                 overlay.style.pointerEvents = "none";
@@ -162,7 +169,7 @@ export default function Home() {
             },
           });
 
-          // PHASE 1 (0.5s → 2.0s): ripple-draw — 8 rings stroke-draw inner → outer
+          // PHASE 1 (0.5s → 1.8s): ripple-draw — rings stroke-draw inner → outer
           intro.to(".intro-ring", {
             strokeDashoffset: 0,
             opacity: 1,
@@ -171,48 +178,72 @@ export default function Home() {
             stagger: 0.09,
           }, 0.5);
 
-          // Wordmark fades in mid-ripple, deliberate
+          // Wordmark fades in mid-ripple
           intro.to(".intro-wordmark", {
             opacity: 1,
             duration: 0.7,
             ease: "power2.out",
           }, 1.2);
 
-          // PHASE 2 (2.0s → 3.6s): HOLD — 1.6s confident presence with subtle "breathing"
-          intro.to(".intro-rings", {
-            scale: 1.025,
-            duration: 1.6,
-            ease: "sine.inOut",
-            transformOrigin: "center center",
-          }, 2.0);
+          // PHASE 2 (2.0s → 2.6s): brief static HOLD — no breath, just confident presence
+          intro.to({}, { duration: 0.6 }, 2.0);
 
-          // PHASE 3 (3.6s → 4.6s): cinematic dissolve with gentle scale-up
+          // PHASE 3 (2.6s → 4.2s): EXIT — branched by EXIT_STYLE
+          // Logo always fades during the exit
           intro.to(".intro-rings", {
-            scale: 1.08,
-            duration: 1.0,
-            ease: "power2.in",
-          }, 3.6);
-          intro.to(".intro-overlay", {
             opacity: 0,
-            duration: 1.0,
-            ease: "power2.inOut",
-          }, 3.6);
+            duration: 0.6,
+            ease: "power2.in",
+          }, 2.8);
 
-          // Cases fan in during the dissolve
+          if (EXIT_STYLE === "curtain") {
+            // CURTAIN: top half slides UP, bottom half slides DOWN — classic film bumper
+            intro.to(".curtain-top", {
+              yPercent: -100,
+              duration: 1.0,
+              ease: "power3.inOut",
+            }, 2.8);
+            intro.to(".curtain-bottom", {
+              yPercent: 100,
+              duration: 1.0,
+              ease: "power3.inOut",
+            }, 2.8);
+          } else if (EXIT_STYLE === "wipe") {
+            // WIPE UP: entire overlay slides up off-screen
+            intro.to(".intro-overlay", {
+              yPercent: -100,
+              duration: 0.9,
+              ease: "expo.inOut",
+            }, 2.9);
+          } else if (EXIT_STYLE === "iris") {
+            // IRIS: animate the CSS custom property --iris from 0% to 100%
+            // The mask gradient is defined in CSS; transparent inner radius grows
+            intro.to(".intro-overlay", {
+              "--iris": "75%",
+              duration: 1.2,
+              ease: "power2.inOut",
+            } as gsap.TweenVars, 2.8);
+            intro.to(".intro-overlay", {
+              opacity: 0,
+              duration: 0.4,
+              ease: "power2.in",
+            }, 3.6);
+          }
+
+          // PHASE 4 (2.8s → 5.0s): GRADUAL hero reveal — cases + text fade in slowly with wider stagger
           intro.to(".case", {
             opacity: 1, y: 0, scale: 1,
-            duration: 0.9,
-            stagger: { each: 0.1, from: "center" },
+            duration: 1.3,
+            stagger: { each: 0.16, from: "center" },
             ease: "power3.out",
-          }, 3.8);
+          }, 2.8);
 
-          // Hero text fades up during the dissolve
           intro.to(".hero-content > *", {
             opacity: 1, y: 0,
-            duration: 0.8,
-            stagger: 0.12,
+            duration: 1.1,
+            stagger: 0.18,
             ease: "power3.out",
-          }, 3.85);
+          }, 3.0);
 
           // Click-to-skip — fast-forward 6x rather than jump (smooth)
           const skip = () => {
@@ -403,27 +434,25 @@ export default function Home() {
       <a href="#main" className="skip-link">Skip to content</a>
 
       {/* ============ FULL-SCREEN CINEMATIC INTRO (once per session) ============ */}
-      <div className="intro-overlay" aria-hidden="true">
+      <div className={`intro-overlay exit-${EXIT_STYLE}`} aria-hidden="true">
+        {/* Curtain panels — only used when EXIT_STYLE = "curtain" */}
+        <div className="curtain-top" aria-hidden="true" />
+        <div className="curtain-bottom" aria-hidden="true" />
         <svg className="intro-rings" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <mask id="gap-mask">
-              <rect width="200" height="200" fill="white" />
-              <rect x="85" y="84" width="115" height="32" fill="black" />
+              <rect x="-20" y="-20" width="240" height="240" fill="white" />
+              <rect x="85" y="84" width="130" height="32" fill="black" />
             </mask>
           </defs>
           <g mask="url(#gap-mask)">
-            {/* 5 rings masked to create perfect horizontal smooth cuts */}
-            <circle className="intro-ring" cx="100" cy="100" r="28" fill="none" stroke="#1757f2" strokeWidth="8" />
-            <circle className="intro-ring" cx="100" cy="100" r="44" fill="none" stroke="#1757f2" strokeWidth="8" />
-            <circle className="intro-ring" cx="100" cy="100" r="60" fill="none" stroke="#1757f2" strokeWidth="8" />
-            <circle className="intro-ring" cx="100" cy="100" r="76" fill="none" stroke="#1757f2" strokeWidth="8" />
-            <circle className="intro-ring" cx="100" cy="100" r="92" fill="none" stroke="#1757f2" strokeWidth="8" />
+            <circle className="intro-ring" cx="100" cy="100" r="32" fill="none" stroke="#1757f2" strokeWidth="10" />
+            <circle className="intro-ring" cx="100" cy="100" r="48" fill="none" stroke="#1757f2" strokeWidth="10" />
+            <circle className="intro-ring" cx="100" cy="100" r="64" fill="none" stroke="#1757f2" strokeWidth="10" />
+            <circle className="intro-ring" cx="100" cy="100" r="80" fill="none" stroke="#1757f2" strokeWidth="10" />
+            <circle className="intro-ring" cx="100" cy="100" r="96" fill="none" stroke="#1757f2" strokeWidth="10" />
           </g>
-          
-          {/* Left-aligned wordmark scaled to end exactly at the outermost circle's curvature arc */}
-          {/* TO SHIFT TEXT HORIZONTALLY: adjust 'x' (currently "92"). Decrease = left, Increase = right. */}
-          {/* TO CHANGE FONT: adjust 'fontSize' (currently "27") and 'fontWeight' (currently "900") below. */}
-          <text className="intro-wordmark" x="92" y="100" textAnchor="start" dominantBaseline="central" fontFamily="var(--font-dm-sans), DM Sans, sans-serif" fontWeight="900" fontSize="27" fill="#111" letterSpacing="0.5">CASEVA</text>
+          <text className="intro-wordmark" x="82" y="100" textAnchor="start" dominantBaseline="central" fontFamily="var(--font-dm-sans), DM Sans, sans-serif" fontWeight="900" fontSize="30" fill="#000" stroke="#000" strokeWidth="0.7" paintOrder="stroke" letterSpacing="0">CASEVA</text>
         </svg>
       </div>
 
@@ -476,12 +505,12 @@ export default function Home() {
 
         <div className="hero-content">
           <h1 className="headline left-align">
-            Phone cases pretty enough<br/>to keep on.
+            Phone cases pretty enough<br />to keep on.
           </h1>
 
           <p className="hero-sub">
             <strong>$24</strong> and up. Fits every iPhone 12 to 16 Pro Max.
-            <br/>
+            <br />
             We ship free.
           </p>
 

@@ -184,9 +184,43 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   pointer-events: auto; /* catches clicks to allow skip */
-  will-change: opacity;
+  will-change: opacity, transform;
+  overflow: hidden;
 }
+
+/* ===== Exit style: CURTAIN (top/bottom panels slide apart) ===== */
+.curtain-top,
+.curtain-bottom {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #fbf3dc;
+  z-index: 1;
+  pointer-events: none;
+  will-change: transform;
+  display: none; /* hidden by default; only shown for curtain exit */
+}
+.curtain-top { top: 0; }
+.curtain-bottom { bottom: 0; }
+.exit-curtain .curtain-top,
+.exit-curtain .curtain-bottom {
+  display: block;
+}
+.exit-curtain { background: transparent; }
+
+/* ===== Exit style: IRIS (radial-gradient mask with growing transparent center) ===== */
+.exit-iris {
+  --iris: 0%;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent var(--iris), #000 calc(var(--iris) + 0.5%));
+  mask-image: radial-gradient(circle at 50% 50%, transparent var(--iris), #000 calc(var(--iris) + 0.5%));
+}
+
+/* Wipe needs no extra CSS — GSAP just animates yPercent on the overlay */
+
 .intro-rings {
+  position: relative;
+  z-index: 10; /* above curtain panels */
   width: min(560px, 72vw);
   height: min(560px, 72vw);
   display: block;
