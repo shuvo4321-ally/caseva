@@ -115,26 +115,113 @@ export default function Home() {
           gsap.set(el, { rotate: Number(el.dataset.rotate || 0) });
         });
 
-        // ----- HERO ENTRANCE: cases fan in from center outward -----
-        gsap.from(".case", {
-          opacity: 0,
-          y: 40,
-          scale: 0.95,
-          duration: 0.7,
-          ease: "power3.out",
-          stagger: { each: 0.08, from: "center" },
-          delay: 0.1,
-        });
+        // ----- Determine whether to play the intro this session -----
+        let showIntro = true;
+        try {
+          showIntro = window.sessionStorage.getItem("caseva-intro-played") !== "true";
+        } catch { /* sessionStorage unavailable */ }
 
-        // ----- HERO ENTRANCE: text block fades up -----
-        gsap.from(".hero-content > *", {
-          opacity: 0,
-          y: 24,
-          duration: 0.7,
-          stagger: 0.1,
-          ease: "power3.out",
-          delay: 0.15,
-        });
+        const overlay = document.querySelector<HTMLElement>(".intro-overlay");
+
+        if (!showIntro || !overlay) {
+          // Skip intro entirely — hide overlay and run normal entrance
+          if (overlay) gsap.set(overlay, { display: "none" });
+
+          gsap.from(".hero-content > *", {
+            opacity: 0, y: 24, duration: 0.6, stagger: 0.1, ease: "power3.out", delay: 0.2,
+          });
+          gsap.from(".case", {
+            opacity: 0, y: 40, scale: 0.95, duration: 0.6,
+            stagger: { each: 0.08, from: "center" }, ease: "power3.out", delay: 0.4,
+          });
+        } else {
+          // ============ FULL-SCREEN CINEMATIC INTRO ============
+          // Prep ring stroke-dasharray so each "draws" from nothing
+          const ringEls = gsap.utils.toArray<SVGCircleElement>(".intro-ring");
+          ringEls.forEach((ring) => {
+            const len = ring.getTotalLength();
+            gsap.set(ring, {
+              strokeDasharray: len,
+              strokeDashoffset: len,
+              opacity: 0,
+            });
+          });
+          gsap.set(".intro-wordmark", { opacity: 0 });
+
+          // Hide hero content + cases until handoff
+          gsap.set(".hero-content > *", { opacity: 0, y: 24 });
+          gsap.set(".case", { opacity: 0, y: 40, scale: 0.95 });
+
+          const intro = gsap.timeline({
+            onComplete: () => {
+              try { window.sessionStorage.setItem("caseva-intro-played", "true"); } catch {}
+              if (overlay) {
+                overlay.style.display = "none";
+                overlay.style.pointerEvents = "none";
+              }
+            },
+          });
+
+          // PHASE 1 (0.5s → 2.0s): ripple-draw — 8 rings stroke-draw inner → outer
+          intro.to(".intro-ring", {
+            strokeDashoffset: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: "expo.out",
+            stagger: 0.09,
+          }, 0.5);
+
+          // Wordmark fades in mid-ripple, deliberate
+          intro.to(".intro-wordmark", {
+            opacity: 1,
+            duration: 0.7,
+            ease: "power2.out",
+          }, 1.2);
+
+          // PHASE 2 (2.0s → 3.6s): HOLD — 1.6s confident presence with subtle "breathing"
+          intro.to(".intro-rings", {
+            scale: 1.025,
+            duration: 1.6,
+            ease: "sine.inOut",
+            transformOrigin: "center center",
+          }, 2.0);
+
+          // PHASE 3 (3.6s → 4.6s): cinematic dissolve with gentle scale-up
+          intro.to(".intro-rings", {
+            scale: 1.08,
+            duration: 1.0,
+            ease: "power2.in",
+          }, 3.6);
+          intro.to(".intro-overlay", {
+            opacity: 0,
+            duration: 1.0,
+            ease: "power2.inOut",
+          }, 3.6);
+
+          // Cases fan in during the dissolve
+          intro.to(".case", {
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.9,
+            stagger: { each: 0.1, from: "center" },
+            ease: "power3.out",
+          }, 3.8);
+
+          // Hero text fades up during the dissolve
+          intro.to(".hero-content > *", {
+            opacity: 1, y: 0,
+            duration: 0.8,
+            stagger: 0.12,
+            ease: "power3.out",
+          }, 3.85);
+
+          // Click-to-skip — fast-forward 6x rather than jump (smooth)
+          const skip = () => {
+            intro.timeScale(6);
+            overlay.removeEventListener("click", skip);
+          };
+          overlay.addEventListener("click", skip);
+        }
+
 
         // ----- HERO PARALLAX: cases drift outward on scroll -----
         gsap.utils.toArray<HTMLElement>(".case").forEach((el) => {
@@ -161,11 +248,13 @@ export default function Home() {
         });
       });
 
-      // Reduced-motion fallback: set final rotation only, no animation
+      // Reduced-motion fallback: cases settled, no intro, no animation
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.utils.toArray<HTMLElement>(".case").forEach((el) => {
           gsap.set(el, { rotate: Number(el.dataset.rotate || 0) });
         });
+        const overlay = document.querySelector<HTMLElement>(".intro-overlay");
+        if (overlay) gsap.set(overlay, { display: "none" });
       });
 
       // ----- Reveal-on-scroll for headlines and rows -----
@@ -313,6 +402,31 @@ export default function Home() {
       {/* Skip link for keyboard users */}
       <a href="#main" className="skip-link">Skip to content</a>
 
+      {/* ============ FULL-SCREEN CINEMATIC INTRO (once per session) ============ */}
+      <div className="intro-overlay" aria-hidden="true">
+        <svg className="intro-rings" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <mask id="gap-mask">
+              <rect width="200" height="200" fill="white" />
+              <rect x="85" y="84" width="115" height="32" fill="black" />
+            </mask>
+          </defs>
+          <g mask="url(#gap-mask)">
+            {/* 5 rings masked to create perfect horizontal smooth cuts */}
+            <circle className="intro-ring" cx="100" cy="100" r="28" fill="none" stroke="#1757f2" strokeWidth="8" />
+            <circle className="intro-ring" cx="100" cy="100" r="44" fill="none" stroke="#1757f2" strokeWidth="8" />
+            <circle className="intro-ring" cx="100" cy="100" r="60" fill="none" stroke="#1757f2" strokeWidth="8" />
+            <circle className="intro-ring" cx="100" cy="100" r="76" fill="none" stroke="#1757f2" strokeWidth="8" />
+            <circle className="intro-ring" cx="100" cy="100" r="92" fill="none" stroke="#1757f2" strokeWidth="8" />
+          </g>
+          
+          {/* Left-aligned wordmark scaled to end exactly at the outermost circle's curvature arc */}
+          {/* TO SHIFT TEXT HORIZONTALLY: adjust 'x' (currently "92"). Decrease = left, Increase = right. */}
+          {/* TO CHANGE FONT: adjust 'fontSize' (currently "27") and 'fontWeight' (currently "900") below. */}
+          <text className="intro-wordmark" x="92" y="100" textAnchor="start" dominantBaseline="central" fontFamily="var(--font-dm-sans), DM Sans, sans-serif" fontWeight="900" fontSize="27" fill="#111" letterSpacing="0.5">CASEVA</text>
+        </svg>
+      </div>
+
       {/* ============ PROMO BAR ============ */}
       <div className="promo-bar" role="region" aria-label="Promotion">
         <span aria-hidden="true">✦</span>
@@ -358,7 +472,7 @@ export default function Home() {
 
       {/* ============ HERO ============ */}
       <section id="main" className="hero" aria-label="Hero">
-        <div className="hero-pattern" aria-hidden="true" />
+
 
         <div className="hero-content">
           <h1 className="headline left-align">

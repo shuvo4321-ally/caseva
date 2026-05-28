@@ -174,6 +174,37 @@ button:focus-visible {
   pointer-events: none;
 }
 
+/* ============ FULL-SCREEN CINEMATIC INTRO ============ */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200; /* above nav (50) and promo (above nav) */
+  background: #fbf3dc; /* matches page bg — covers everything cleanly */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto; /* catches clicks to allow skip */
+  will-change: opacity;
+}
+.intro-rings {
+  width: min(560px, 72vw);
+  height: min(560px, 72vw);
+  display: block;
+  overflow: visible;
+  transform-origin: center;
+  will-change: transform;
+}
+/* Each ring starts hidden (stroke-dashoffset = circumference, set by GSAP) */
+.intro-ring {
+  will-change: stroke-dashoffset, opacity;
+  opacity: 0; /* GSAP reveals as it draws */
+}
+.intro-wordmark,
+.intro-wordmark-bg {
+  opacity: 0; /* GSAP fades in */
+}
+.intro-wordmark { letter-spacing: 0.5px; }
+
 .hero-content {
   position: relative;
   z-index: 4;
