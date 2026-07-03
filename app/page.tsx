@@ -245,9 +245,9 @@ export default function Home() {
           // Per-ring timing: linear, evenly spaced starts (each 0.22) so every ring
           // closes on its own beat — a clear one-by-one radar pulse, not a parallel finish.
           const RING_START = 0.15;
-          const RING_EACH = 0.16; // tighter overlap → rings flow as one expansion
+          const RING_EACH = 0.16;
           const RING_DUR = 0.58;
-
+          
           // ===== Rolling odometer counter (000 → 100%) =====
           // One tweened value drives three digit columns via GPU translateY.
           // Hits 100 exactly as the opening starts (2.75s).
@@ -256,11 +256,28 @@ export default function Home() {
           const colO = document.querySelector<HTMLElement>(".ic-col-o");
           if (colH && colT && colO) {
             const cnt = { v: 0 };
+            
+            // Stagger pop-in the counter digits
+            intro.fromTo(".ic-digit", 
+              { opacity: 0, y: 15 },
+              { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "back.out(2)" }, 
+              RING_START - 0.2
+            );
+
             intro.to(cnt, {
               v: 100,
               duration: 2.6 - RING_START,
               ease: "power2.inOut",
               onUpdate: () => {
+                // Add motion blur class when spinning fast
+                if (cnt.v > 10 && cnt.v < 90) {
+                  colO.classList.add("blur-spin");
+                  colT.classList.add("blur-spin-light");
+                } else {
+                  colO.classList.remove("blur-spin");
+                  colT.classList.remove("blur-spin-light");
+                }
+
                 colO.style.transform = `translateY(${-cnt.v}em)`;            // ones spin fast (101 rows)
                 colT.style.transform = `translateY(${-(cnt.v / 10)}em)`;     // tens roll continuously
                 colH.style.transform = `translateY(${-Math.max(0, cnt.v - 99)}em)`; // "1" arrives at the end
@@ -401,14 +418,8 @@ export default function Home() {
           // PHASE 4: brief beat on the finished lockup, then flow out.
 
           // PHASE 5 (2.7s → 3.8s): EXIT — branched by EXIT_STYLE
-          // Logo always fades during the exit
-          intro.to(".intro-mark", {
-            opacity: 0,
-            duration: 0.55,
-            ease: "power2.in",
-          }, 2.7);
-
           if (EXIT_STYLE === "curtain") {
+            intro.to(".intro-mark", { opacity: 0, duration: 0.55, ease: "power2.in" }, 2.7);
             // CURTAIN: top half slides UP, bottom half slides DOWN — classic film bumper
             intro.to(".curtain-top", {
               yPercent: -100,
@@ -421,6 +432,7 @@ export default function Home() {
               ease: "power3.inOut",
             }, 2.7);
           } else if (EXIT_STYLE === "wipe") {
+            intro.to(".intro-mark", { opacity: 0, duration: 0.55, ease: "power2.in" }, 2.7);
             // OPENING: the loader panel lifts up like a curtain (beautyinstem-style)
             // while the page underneath settles from a slight zoom — the "opening".
             intro.to(".intro-overlay", {
@@ -433,16 +445,24 @@ export default function Home() {
               { scale: 1, duration: 1.3, ease: "power3.out", clearProps: "transform" },
               2.85);
           } else if (EXIT_STYLE === "iris") {
-            // REVEAL: a GPU-cheap scale-up + fade. The previous version animated a
-            // full-screen radial-gradient MASK every frame, which re-rasterizes the
-            // whole overlay each tick and stutters on mobile right as the hero appears.
-            // Pure transform + opacity composites on the GPU — smooth hand-off.
-            intro.to(".intro-overlay", {
-              scale: 1.12,
+            // ZOOM-THROUGH REVEAL:
+            // The Rings explode outwards while the overlay fades, creating a 
+            // 3D dive through the center of the logo.
+            intro.to(".intro-counter, .intro-wordmark", {
+              opacity: 0, duration: 0.3, ease: "power2.out"
+            }, 2.5);
+
+            intro.to(".intro-mark", {
+              scale: 30,
               opacity: 0,
-              duration: 0.9,
-              ease: "power2.inOut",
+              duration: 1.1,
+              ease: "expo.in",
               transformOrigin: "50% 50%",
+            }, 2.6);
+            intro.to(".intro-overlay", {
+              opacity: 0,
+              duration: 0.7,
+              ease: "power2.inOut",
             }, 2.8);
           }
 

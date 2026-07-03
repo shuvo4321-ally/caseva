@@ -48,6 +48,8 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100vw;
+
   gap: 14px;
 }
 .promo-bar span:first-child,
@@ -68,6 +70,7 @@ button:focus-visible {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 10px 0;
+  width: 100vw;
 }
 .nav-inner {
   display: flex;
@@ -222,8 +225,8 @@ button:focus-visible {
   position: relative;
   z-index: 10; /* above curtain panels */
   /* vmin: identical presence in portrait and landscape, never taller than the screen */
-  width: min(560px, 84vmin);
-  height: min(560px, 84vmin);
+  width: min(380px, 60vmin);
+  height: min(380px, 60vmin);
   transform-origin: center;
   will-change: transform;
 }
@@ -242,6 +245,7 @@ button:focus-visible {
     height: 62vw;
   }
   .intro-counter { font-size: 15px; bottom: 30px; }
+  .intro-ring { stroke-width: 8px; }
 }
 /* Each ring starts hidden (stroke-dashoffset = circumference, set by GSAP) */
 .intro-ring {
@@ -292,6 +296,15 @@ button:focus-visible {
   min-width: 0.62em;
 }
 .ic-pct { line-height: 1; margin-left: 2px; }
+
+/* motion blur for odometer spin */
+.blur-spin {
+  filter: blur(2px) drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  opacity: 0.8;
+}
+.blur-spin-light {
+  filter: blur(1px);
+}
 
 .hero-content {
   position: relative;
