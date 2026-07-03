@@ -1,6 +1,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body { overflow-x: hidden; }
+html, body { overflow-x: hidden; scrollbar-gutter: stable; }
 
 body {
   font-family: var(--font-dm-sans), system-ui, sans-serif;
@@ -179,7 +179,7 @@ button:focus-visible {
   position: fixed;
   inset: 0;
   z-index: 200; /* above nav (50) and promo (above nav) */
-  background: #fbf3dc; /* matches page bg — covers everything cleanly */
+  background: #fffad6; /* loader brand cream (RGB 255, 250, 214) */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,7 +195,7 @@ button:focus-visible {
   left: 0;
   width: 100%;
   height: 50%;
-  background: #fbf3dc;
+  background: #fffad6; /* keep curtain exit panels on the loader cream */
   z-index: 1;
   pointer-events: none;
   will-change: transform;
@@ -210,23 +210,38 @@ button:focus-visible {
 .exit-curtain { background: transparent; }
 
 /* ===== Exit style: IRIS (radial-gradient mask with growing transparent center) ===== */
+/* The iris mask is attached by GSAP only when the exit starts — a "closed"
+   radial-gradient mask leaves a visible transparent pinhole at dead center */
 .exit-iris {
   --iris: 0%;
-  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent var(--iris), #000 calc(var(--iris) + 0.5%));
-  mask-image: radial-gradient(circle at 50% 50%, transparent var(--iris), #000 calc(var(--iris) + 0.5%));
 }
 
 /* Wipe needs no extra CSS — GSAP just animates yPercent on the overlay */
 
-.intro-rings {
+.intro-mark {
   position: relative;
   z-index: 10; /* above curtain panels */
-  width: min(560px, 72vw);
-  height: min(560px, 72vw);
+  /* vmin: identical presence in portrait and landscape, never taller than the screen */
+  width: min(560px, 84vmin);
+  height: min(560px, 84vmin);
+  transform-origin: center;
+  will-change: transform;
+}
+.intro-rings {
+  width: 100%;
+  height: 100%;
   display: block;
   overflow: visible;
   transform-origin: center;
-  will-change: transform;
+}
+
+/* Mobile: scale the loader mark down (desktop size unchanged) */
+@media (max-width: 640px) {
+  .intro-mark {
+    width: 62vw;
+    height: 62vw;
+  }
+  .intro-counter { font-size: 15px; bottom: 30px; }
 }
 /* Each ring starts hidden (stroke-dashoffset = circumference, set by GSAP) */
 .intro-ring {
@@ -235,9 +250,48 @@ button:focus-visible {
 }
 .intro-wordmark,
 .intro-wordmark-bg {
-  opacity: 0; /* GSAP fades in */
+  opacity: 0; /* GSAP slides in from the right */
 }
 .intro-wordmark { letter-spacing: 0.5px; }
+
+/* Rolling odometer counter — bare digits */
+.intro-counter {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-start;
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: #111;
+  letter-spacing: 0.5px;
+  padding: 11px 20px;
+  overflow: hidden;
+  will-change: transform;
+}
+/* digits sit above the sheen */
+.ic-digit, .ic-pct { position: relative; z-index: 1; }
+.ic-digit {
+  display: block;
+  height: 1em;
+  line-height: 1;
+  overflow: hidden;
+}
+.ic-col {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+.ic-col span {
+  display: block;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+  min-width: 0.62em;
+}
+.ic-pct { line-height: 1; margin-left: 2px; }
 
 .hero-content {
   position: relative;
@@ -246,16 +300,6 @@ button:focus-visible {
   padding-left: 40px;
 }
 
-
-.hero-sub {
-  font-size: 19px;
-  line-height: 1.5;
-  color: #2a2a2a;
-  max-width: 460px;
-  margin-bottom: 28px;
-  font-weight: 500;
-}
-.hero-sub strong { color: #111; font-weight: 800; }
 
 /* ============ PHONE-MODEL SELECTOR ============ */
 .model-selector {
@@ -351,20 +395,6 @@ button:focus-visible {
 .model-option.is-selected { background: rgba(37, 64, 173, 0.08); color: #2540ad; font-weight: 700; }
 .model-check { width: 16px; height: 16px; flex-shrink: 0; }
 
-/* Quiet trust strip below the CTA */
-.hero-trust-strip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  list-style: none;
-  padding: 0;
-  margin: 22px 0 0;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  color: #6a6a5a;
-}
-.hero-trust-strip li { display: inline-flex; }
 
 .cases {
   position: relative;
@@ -857,17 +887,16 @@ button:focus-visible {
   .logo { font-size: 28px; }
   .nav-right { gap: 20px; }
   .shop-btn { padding: 12px 32px; font-size: 16px; }
-  .cases { height: 640px; }
-  .case-center { width: 320px; left: calc(50% - 160px); top: 40px; }
-  .case-tl, .case-tr { width: 240px; top: 20px; }
-  .case-bl, .case-br { width: 240px; top: 280px; }
-  .case-tl { left: -2%; }
-  .case-tr { right: -2%; }
-  .case-bl { left: -4%; }
-  .case-br { right: -4%; }
-  .arched-text text { font-size: 44px; }
-  .description { font-size: 16px; }
+  .hero-content { padding-left: 24px; }
+  /* 0.8× fan for tablets */
+  .cases { width: 460px; height: 470px; margin-right: -60px; }
+  .case-fan-0 { width: 240px; height: 360px; left: -80px; top: 64px; }
+  .case-fan-1 { width: 240px; height: 360px; left: -16px; top: 32px; }
+  .case-fan-2 { width: 256px; height: 384px; left: 48px; top: 0; }
+  .case-fan-3 { width: 240px; height: 360px; left: 112px; top: 32px; }
+  .case-fan-4 { width: 240px; height: 360px; left: 176px; top: 64px; }
   .headline { font-size: 44px; }
+  .headline.left-align { font-size: 42px; }
   .vp-text { font-size: 22px; }
   .vp-tr, .vp-bl, .vp-br { width: 160px !important; }
   .cheers-case { width: 280px; }
@@ -886,20 +915,37 @@ button:focus-visible {
 }
 
 @media (max-width: 640px) {
-  .hero { padding: 20px 18px 40px; }
+  body { overflow-x: hidden; }
+  /* Compact one-line promo */
+  .promo-bar { font-size: 12px; padding: 8px 12px; gap: 6px; white-space: nowrap; }
+  .promo-bar span:first-child,
+  .promo-bar span:last-child { display: none; }
+  .nav-bar { padding: 8px 0; }
+  .logo { font-size: 24px; }
+  /* Hero = one composed screen: copy on top, product fan anchored at the bottom */
+  .hero {
+    padding: 12px 18px 20px;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: calc(100dvh - 92px); /* promo + nav */
+  }
   .nav-link { display: none; }
-  .cases { height: 420px; }
-  .case-center { width: 180px; top: 30px; }
-  .case-tl, .case-tr, .case-bl, .case-br { width: 120px; }
-  .case-tl { left: 2%; top: 50px; }
-  .case-tr { right: 2%; top: 50px; }
-  .case-bl { left: 0%; top: 230px; }
-  .case-br { right: 0%; top: 230px; }
-  .arched-text text { font-size: 30px; }
-  .arched-text { margin-top: -30px; }
-  .cta { padding: 12px 36px; font-size: 16px; }
-  .description { font-size: 15px; margin-top: 28px; }
+  .hero-content { padding-left: 0; max-width: 100%; }
+  .headline.left-align { font-size: 31px; line-height: 1.08; letter-spacing: -0.8px; margin-bottom: 10px; }
+  .desktop-br { display: none; } /* let the headline wrap naturally on mobile */
   .headline { font-size: 32px; }
+  /* Full-width tappable controls */
+  .model-selector { display: block; width: 100%; margin-bottom: 12px; }
+  .model-trigger { width: 100%; justify-content: space-between; }
+  .cta-wrap.left-align { margin-top: 0; }
+  .cta { width: 100%; justify-content: center; padding: 14px 20px; font-size: 16px; }
+  /* 0.62× fan, pinned to the bottom of the first screen — product always visible */
+  .cases { width: 100%; height: 330px; margin: auto 0 0; align-self: center; }
+  .case-fan-0 { width: 186px; height: 279px; left: calc(50% - 197px); top: 48px; }
+  .case-fan-1 { width: 186px; height: 279px; left: calc(50% - 145px); top: 24px; }
+  .case-fan-2 { width: 198px; height: 297px; left: calc(50% - 99px); top: 0; }
+  .case-fan-3 { width: 186px; height: 279px; left: calc(50% - 41px); top: 24px; }
+  .case-fan-4 { width: 186px; height: 279px; left: calc(50% + 11px); top: 48px; }
   .value-prop, .cheers, .comparison, .testimonial, .subscribe, .press { padding: 70px 24px; }
   .vp-text { font-size: 18px; }
   .cheers-stage { height: auto; flex-direction: column; gap: 30px; align-items: center; }

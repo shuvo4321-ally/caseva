@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -28,21 +28,10 @@ const MODEL_STORAGE_KEY = "caseva-iphone-model";
 
 // ============ INTRO EXIT STYLE ============
 // Change this to pick which exit you want:
-//   "curtain" → top half slides UP, bottom half slides DOWN (classic film-studio bumper)
-//   "wipe"    → entire overlay slides UP off-screen (Apple/Stripe modern feel)
-//   "iris"    → growing transparent circle in the center reveals hero through the overlay
-const EXIT_STYLE: "curtain" | "wipe" | "iris" = "wipe";
-
-// ============ LOADER FLAVOR ============
-//   "classic"   → the clean radar draw (rings trace one-by-one, center → out)
-//   "cinematic" → classic draw + depth scale-in, a gentle spin and a wordmark
-//                 overshoot. No spark dots, no pulse, no end beat.
-//   "thread"    → (masked) rings draw, then CASEVA threads through; each ring's gap
-//                 parts outer → inner, locked to one clock. Heaviest — animates masks.
-//   "lite"      → SAME look as "thread" (per-ring parting, straight edges) but each
-//                 ring is parted by a stacked cream rect, not an SVG mask — far lighter.
-// Flip back to "classic" to instantly revert. Pure GSAP — no deps.
-const LOADER_FX: "classic" | "cinematic" | "thread" | "lite" = "lite";
+//   "curtain" ΓåÆ top half slides UP, bottom half slides DOWN (classic film-studio bumper)
+//   "wipe"    ΓåÆ entire overlay slides UP off-screen (Apple/Stripe modern feel)
+//   "iris"    ΓåÆ growing transparent circle in the center reveals hero through the overlay
+const EXIT_STYLE: "curtain" | "wipe" | "iris" = "iris";
 
 const heroCases = [
   { src: "/tulip-case-v2.png", alt: "Tulip pattern case", className: "case case-fan-0", rotate: -30, x: -200, y: 60, priority: true },
@@ -54,12 +43,12 @@ const heroCases = [
 
 
 const benefits = [
-  { icon: "🛡️", label: "Drop Protection" },
-  { icon: "✨", label: "Premium Finish" },
-  { icon: "🧲", label: "MagSafe Ready" },
-  { icon: "🌿", label: "Eco Materials" },
-  { icon: "📱", label: "Slim Profile" },
-  { icon: "💖", label: "Designed in CA" },
+  { icon: "≡ƒ¢í∩╕Å", label: "Drop Protection" },
+  { icon: "Γ£¿", label: "Premium Finish" },
+  { icon: "≡ƒº▓", label: "MagSafe Ready" },
+  { icon: "≡ƒî┐", label: "Eco Materials" },
+  { icon: "≡ƒô▒", label: "Slim Profile" },
+  { icon: "≡ƒÆû", label: "Designed in CA" },
 ];
 
 const collection = [
@@ -73,36 +62,8 @@ const collection = [
 const reviews = [
   { quote: "Honestly the prettiest case I've owned. Slim but solid.", author: "Vogue" },
   { quote: "The only phone case that makes me want to take it off less.", author: "Harper's Bazaar" },
-  { quote: "Stylish, durable, sustainable — a rare combo.", author: "Refinery29" },
+  { quote: "Stylish, durable, sustainable ΓÇö a rare combo.", author: "Refinery29" },
 ];
-
-function CounterDigits() {
-  return (
-    <>
-      <span className="ic-digit">
-        <span className="ic-col ic-col-h">
-          <span>0</span>
-          <span>1</span>
-        </span>
-      </span>
-      <span className="ic-digit">
-        <span className="ic-col ic-col-t">
-          {Array.from({ length: 11 }).map((_, i) => (
-            <span key={i}>{i % 10}</span>
-          ))}
-        </span>
-      </span>
-      <span className="ic-digit">
-        <span className="ic-col ic-col-o">
-          {Array.from({ length: 101 }).map((_, i) => (
-            <span key={i}>{i % 10}</span>
-          ))}
-        </span>
-      </span>
-      <span className="ic-pct">%</span>
-    </>
-  );
-}
 
 export default function Home() {
   const root = useRef<HTMLDivElement>(null);
@@ -156,10 +117,6 @@ export default function Home() {
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // Non-GSAP side effects (timeouts) registered here are torn down when
-        // the matchMedia context reverts (unmount / dev hot-reload)
-        const cleanupFns: Array<() => void> = [];
-
         // Set initial rotation for each case
         gsap.utils.toArray<HTMLElement>(".case").forEach((el) => {
           gsap.set(el, { rotate: Number(el.dataset.rotate || 0) });
@@ -174,7 +131,7 @@ export default function Home() {
         const overlay = document.querySelector<HTMLElement>(".intro-overlay");
 
         if (!showIntro || !overlay) {
-          // Skip intro entirely — hide overlay and run normal entrance
+          // Skip intro entirely ΓÇö hide overlay and run normal entrance
           if (overlay) gsap.set(overlay, { display: "none" });
 
           gsap.from(".hero-content > *", {
@@ -186,283 +143,109 @@ export default function Home() {
           });
         } else {
           // ============ FULL-SCREEN CINEMATIC INTRO ============
-          // "A radar pulse being born" — rings trace themselves center → out as full
-          // circles with a glowing ink stroke, the C-gap breathes open, CASEVA slides
-          // in from the right, then one giant heartbeat pulse. ~3s brand moment.
-
-          // Prep ring stroke-dasharray so each "draws" from nothing.
-          // +2 overlap: getTotalLength() runs a hair short of the rendered
-          // circumference, which leaves a hairline seam where the circle closes
+          // Prep ring stroke-dasharray so each "draws" from nothing
           const ringEls = gsap.utils.toArray<SVGCircleElement>(".intro-ring");
           ringEls.forEach((ring) => {
-            const len = ring.getTotalLength() + 2;
+            const len = ring.getTotalLength();
             gsap.set(ring, {
               strokeDasharray: len,
               strokeDashoffset: len,
               opacity: 0,
             });
           });
-          gsap.set(".intro-wordmark", { opacity: 0, x: 70 });
-
-          // The loader owns the screen: kill the browser's deferred scroll
-          // restoration (it would yank the page down after the intro), start
-          // at the top, and lock scrolling behind the overlay
-          if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-          window.scrollTo(0, 0);
-          // Lock BOTH html + body so no scrollbar ("slider") shows behind the loader
-          document.documentElement.style.overflow = "hidden";
-          document.body.style.overflow = "hidden";
+          gsap.set(".intro-wordmark", { opacity: 0 });
 
           // Hide hero content + cases until handoff
           gsap.set(".hero-content > *", { opacity: 0, y: 24 });
           gsap.set(".case", { opacity: 0, y: 40, scale: 0.95 });
 
-          const finishIntro = () => {
-            window.clearTimeout(failsafe);
-            try { window.sessionStorage.setItem("caseva-intro-played", "true"); } catch { }
-            document.documentElement.style.overflow = "";
-            document.body.style.overflow = "";
-            if ("scrollRestoration" in history) history.scrollRestoration = "auto";
-            overlay.style.display = "none";
-            overlay.style.pointerEvents = "none";
-            // Defer the (synchronous, heavy) trigger recalc off the hand-off frame
-            setTimeout(() => ScrollTrigger.refresh(), 100);
-          };
+          const intro = gsap.timeline({
+            onComplete: () => {
+              try { window.sessionStorage.setItem("caseva-intro-played", "true"); } catch { }
+              if (overlay) {
+                overlay.style.display = "none";
+                overlay.style.pointerEvents = "none";
+              }
+            },
+          });
 
-          const intro = gsap.timeline({ onComplete: finishIntro });
-
-          // Failsafe: if the timeline can't run to completion (throttled tab,
-          // battery saver, dropped frames), never trap the user behind the
-          // overlay — kill the intro and finish the handoff manually
-          const failsafe = window.setTimeout(() => {
-            intro.kill();
-            gsap.set(".hero-content > *", { opacity: 1, y: 0 });
-            gsap.set(".case", { opacity: 1, y: 0, scale: 1 });
-            finishIntro();
-          }, 9000);
-          cleanupFns.push(() => window.clearTimeout(failsafe));
-
-          // Per-ring timing: linear, evenly spaced starts (each 0.22) so every ring
-          // closes on its own beat — a clear one-by-one radar pulse, not a parallel finish.
-          const RING_START = 0.15;
-          const RING_EACH = 0.16; // tighter overlap → rings flow as one expansion
-          const RING_DUR = 0.58;
-
-          // ===== Rolling odometer counter (000 → 100%) =====
-          // One tweened value drives three digit columns via GPU translateY.
-          // Hits 100 exactly as the opening starts (2.75s).
-          const colH = document.querySelector<HTMLElement>(".ic-col-h");
-          const colT = document.querySelector<HTMLElement>(".ic-col-t");
-          const colO = document.querySelector<HTMLElement>(".ic-col-o");
-          if (colH && colT && colO) {
-            const cnt = { v: 0 };
-            intro.to(cnt, {
-              v: 100,
-              duration: 2.6 - RING_START,
-              ease: "power2.inOut",
-              onUpdate: () => {
-                colO.style.transform = `translateY(${-cnt.v}em)`;            // ones spin fast (101 rows)
-                colT.style.transform = `translateY(${-(cnt.v / 10)}em)`;     // tens roll continuously
-                colH.style.transform = `translateY(${-Math.max(0, cnt.v - 99)}em)`; // "1" arrives at the end
-              },
-            }, RING_START);
-            // gentle float — the pill bobs like it's buoyant while counting
-            intro.to(".intro-counter", {
-              y: -6, duration: 0.85, ease: "sine.inOut", yoyo: true, repeat: 3,
-            }, 0.3);
-          }
-
-          if (LOADER_FX === "cinematic") {
-            // CINEMATIC depth: whole mark eases in from slightly small + softly spun,
-            // resolving to rest BEFORE the gap opens (so the C-gap lands square).
-            intro.from(".intro-rings", {
-              scale: 0.86,
-              duration: 1.45,
-              ease: "power3.out",
-            }, RING_START);
-            intro.from(".intro-rings", {
-              rotation: -9,
-              duration: 1.5,
-              ease: "power3.out",
-              transformOrigin: "50% 50%",
-            }, RING_START);
-          }
-
-          // PHASE 1: rings trace themselves one by one, center → out.
-          // (DOM order is outer → inner, so stagger from "end" = inner-first = center → out.)
-          const ringStagger = { each: RING_EACH, ease: "none", from: "end" as const };
-          intro.to(".intro-ring", {
-            opacity: 1,
-            duration: 0.16,
-            ease: "none",
-            stagger: ringStagger,
-          }, RING_START);
+          // PHASE 1 (0.5s ΓåÆ 1.8s): ripple-draw ΓÇö rings stroke-draw inner ΓåÆ outer
           intro.to(".intro-ring", {
             strokeDashoffset: 0,
-            duration: RING_DUR,
-            ease: "power2.inOut",
-            stagger: ringStagger,
-          }, RING_START);
+            opacity: 1,
+            duration: 0.9,
+            ease: "expo.out",
+            stagger: 0.09,
+          }, 0.5);
 
-          if (LOADER_FX === "thread") {
-            // ============ THREAD: CASEVA threads through the rings ============
-            // One clock drives BOTH: each ring's gap parts (outer → inner) exactly as
-            // the leading letter reaches it, and the wordmark rides just behind that
-            // opening frontier. Gap-openings and the text share the same start, duration
-            // and ease, so they're mechanically locked — a beat off would "collapse" it.
-            const gapRects = gsap.utils.toArray<SVGRectElement>(".gap-rect"); // inner → outer
-            const outerFirst = gapRects.slice().reverse();                    // outer → inner
-            const THREAD_AT = 1.5;
-            const THREAD_DUR = 1.0;
-            const STEP = 0.15; // delay between successive ring openings, in progress units
-            const WIN = 0.34;  // how long each individual ring takes to part
-            const sweep = { p: 0 };
-            intro.to(sweep, {
-              p: 1,
-              duration: THREAD_DUR,
-              ease: "power2.inOut",
-              onUpdate: () => {
-                outerFirst.forEach((rect, k) => {
-                  const o = gsap.utils.clamp(0, 1, (sweep.p - k * STEP) / WIN);
-                  rect.setAttribute("height", String(32 * o));
-                  rect.setAttribute("y", String(100 - 16 * o));
-                });
-              },
-            }, THREAD_AT);
+          // Wordmark fades in mid-ripple
+          intro.to(".intro-wordmark", {
+            opacity: 1,
+            duration: 0.7,
+            ease: "power2.out",
+          }, 1.2);
 
-            // Wordmark threads in from the right, locked to the same clock + ease.
-            intro.fromTo(".intro-wordmark",
-              { x: 96, opacity: 0 },
-              { x: 0, duration: THREAD_DUR, ease: "power2.inOut" },
-              THREAD_AT);
-            intro.to(".intro-wordmark", {
-              opacity: 1, duration: 0.4, ease: "power2.out",
-            }, THREAD_AT + 0.1);
-            intro.to(".intro-mark", {
-              xPercent: -1.5, duration: THREAD_DUR, ease: "power2.inOut",
-            }, THREAD_AT);
-          } else if (LOADER_FX === "lite") {
-            // ===== THREAD (lite): per-ring parting via stacked cream rects, no masks =====
-            // Each ring sits directly under a full-width cream rect; rings + rects are
-            // stacked outer → inner, so rect-k hides ring-k (outer rings already parted).
-            // Each rect grows its height — STRAIGHT horizontal edges, like the logo — on a
-            // stagger, so rings part outer → inner. Same look as "thread", far lighter
-            // (no mask re-rasterization; just a few small cream-rect repaints).
-            const partRects = gsap.utils.toArray<SVGRectElement>(".part-rect"); // DOM: outer → inner
-            const THREAD_AT = 1.5;
-            const THREAD_DUR = 0.95;
-            intro.to(partRects, {
-              attr: { y: 84, height: 32 },
-              duration: 0.4,
-              ease: "power2.out",
-              stagger: 0.13,
-            }, THREAD_AT);
+          // PHASE 2 (2.0s ΓåÆ 2.6s): brief static HOLD ΓÇö no breath, just confident presence
+          intro.to({}, { duration: 0.6 }, 2.0);
 
-            intro.fromTo(".intro-wordmark",
-              { x: 96, opacity: 0 },
-              { x: 0, duration: THREAD_DUR, ease: "power2.inOut" },
-              THREAD_AT);
-            intro.to(".intro-wordmark", {
-              opacity: 1, duration: 0.4, ease: "power2.out",
-            }, THREAD_AT + 0.1);
-
-            intro.to(".intro-mark", {
-              xPercent: -1.5, duration: THREAD_DUR, ease: "power2.inOut",
-            }, THREAD_AT);
-          } else {
-            // PHASE 2 — DOMINO: each ring's gap opens shortly after THAT ring finishes
-            // drawing, cascading inner → outer. The gap stagger (0.16) matches the ring
-            // stagger, and the start (0.9) sits ~0.17s after ring 0 closes — so every
-            // ring gets its own "complete → beat → open", never all opening at once.
-            intro.to(".gap-rect", {
-              attr: { y: 84, height: 32 },
-              duration: 0.38,
-              ease: "power2.out",
-              stagger: { each: 0.16, from: "start" },
-            }, 0.9);
-
-            // PHASE 3 (1.95s → 2.55s): CASEVA hops in AFTER the domino finishes.
-            intro.to(".intro-wordmark", {
-              x: 0,
-              opacity: 1,
-              duration: 0.6,
-              ease: "back.out(1.6)",
-            }, 1.95);
-
-            // The wordmark juts past the rings' right edge, so the whole mark
-            // glides slightly left as the text lands — final lockup sits dead-center
-            intro.to(".intro-mark", {
-              xPercent: -1.5,
-              duration: 0.7,
-              ease: "expo.out",
-            }, 1.95);
-          }
-
-          // PHASE 4: brief beat on the finished lockup, then flow out.
-
-          // PHASE 5 (2.7s → 3.8s): EXIT — branched by EXIT_STYLE
+          // PHASE 3 (2.6s ΓåÆ 4.2s): EXIT ΓÇö branched by EXIT_STYLE
           // Logo always fades during the exit
-          intro.to(".intro-mark", {
+          intro.to(".intro-rings", {
             opacity: 0,
-            duration: 0.55,
+            duration: 0.6,
             ease: "power2.in",
-          }, 2.7);
+          }, 2.8);
 
           if (EXIT_STYLE === "curtain") {
-            // CURTAIN: top half slides UP, bottom half slides DOWN — classic film bumper
+            // CURTAIN: top half slides UP, bottom half slides DOWN ΓÇö classic film bumper
             intro.to(".curtain-top", {
               yPercent: -100,
               duration: 1.0,
               ease: "power3.inOut",
-            }, 2.7);
+            }, 2.8);
             intro.to(".curtain-bottom", {
               yPercent: 100,
               duration: 1.0,
               ease: "power3.inOut",
-            }, 2.7);
+            }, 2.8);
           } else if (EXIT_STYLE === "wipe") {
-            // OPENING: the loader panel lifts up like a curtain (beautyinstem-style)
-            // while the page underneath settles from a slight zoom — the "opening".
+            // WIPE UP: entire overlay slides up off-screen
             intro.to(".intro-overlay", {
               yPercent: -100,
-              duration: 1.0,
-              ease: "power4.inOut",
-            }, 2.75);
-            intro.fromTo(".hero",
-              { scale: 1.05, transformOrigin: "50% 25%" },
-              { scale: 1, duration: 1.3, ease: "power3.out", clearProps: "transform" },
-              2.85);
-          } else if (EXIT_STYLE === "iris") {
-            // REVEAL: a GPU-cheap scale-up + fade. The previous version animated a
-            // full-screen radial-gradient MASK every frame, which re-rasterizes the
-            // whole overlay each tick and stutters on mobile right as the hero appears.
-            // Pure transform + opacity composites on the GPU — smooth hand-off.
-            intro.to(".intro-overlay", {
-              scale: 1.12,
-              opacity: 0,
               duration: 0.9,
+              ease: "expo.inOut",
+            }, 2.9);
+          } else if (EXIT_STYLE === "iris") {
+            // IRIS: animate the CSS custom property --iris from 0% to 100%
+            // The mask gradient is defined in CSS; transparent inner radius grows
+            intro.to(".intro-overlay", {
+              "--iris": "75%",
+              duration: 1.2,
               ease: "power2.inOut",
-              transformOrigin: "50% 50%",
-            }, 2.8);
+            } as gsap.TweenVars, 2.8);
+            intro.to(".intro-overlay", {
+              opacity: 0,
+              duration: 0.4,
+              ease: "power2.in",
+            }, 3.6);
           }
 
-          // PHASE 6 (2.7s → 4.9s): GRADUAL hero reveal — cases + text flow in,
-          // overlapping the exit so the loader dissolves straight into the page.
+          // PHASE 4 (2.8s ΓåÆ 5.0s): GRADUAL hero reveal ΓÇö cases + text fade in slowly with wider stagger
           intro.to(".case", {
             opacity: 1, y: 0, scale: 1,
             duration: 1.3,
             stagger: { each: 0.16, from: "center" },
             ease: "power3.out",
-          }, 2.7);
+          }, 2.8);
 
           intro.to(".hero-content > *", {
             opacity: 1, y: 0,
             duration: 1.1,
             stagger: 0.18,
             ease: "power3.out",
-          }, 2.9);
+          }, 3.0);
 
-          // Click-to-skip — fast-forward 6x rather than jump (smooth)
+          // Click-to-skip ΓÇö fast-forward 6x rather than jump (smooth)
           const skip = () => {
             intro.timeScale(6);
             overlay.removeEventListener("click", skip);
@@ -494,8 +277,6 @@ export default function Home() {
           ease: "none",
           scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 0.6 },
         });
-
-        return () => cleanupFns.forEach((fn) => fn());
       });
 
       // Reduced-motion fallback: cases settled, no intro, no animation
@@ -654,51 +435,32 @@ export default function Home() {
 
       {/* ============ FULL-SCREEN CINEMATIC INTRO (once per session) ============ */}
       <div className={`intro-overlay exit-${EXIT_STYLE}`} aria-hidden="true">
-        {/* Curtain panels — only used when EXIT_STYLE = "curtain" */}
+        {/* Curtain panels ΓÇö only used when EXIT_STYLE = "curtain" */}
         <div className="curtain-top" aria-hidden="true" />
         <div className="curtain-bottom" aria-hidden="true" />
-        <div className="intro-mark">
         <svg className="intro-rings" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          {LOADER_FX !== "lite" && (
-            <defs>
-              {/* One mask per ring so each "C" gap can open on its own beat (the
-                  gap-rect starts closed at height 0; GSAP staggers them open).
-                  Lite mode ships NO masks at all — cheaper DOM + zero raster risk. */}
-              {[32, 48, 64, 80, 96].map((r, i) => (
-                <mask key={r} id={`gap-mask-${i}`} maskUnits="userSpaceOnUse" x="-200" y="-200" width="600" height="600">
-                  <rect x="-200" y="-200" width="600" height="600" fill="white" />
-                  <rect className="gap-rect" data-ring={i} x="85" y="100" width="130" height="0" fill="black" />
-                </mask>
-              ))}
-            </defs>
-          )}
-          <g className="intro-ring-group">
-            {/* Rendered outer → inner so each ring sits ABOVE the cream rect that parts
-                the rings beneath it (lite mode). Masks still drive the gap in other modes. */}
-            {[96, 80, 64, 48, 32].map((r) => {
-              const i = [32, 48, 64, 80, 96].indexOf(r);
-              return (
-                <g key={r}>
-                  <circle className="intro-ring" mask={LOADER_FX === "lite" ? undefined : `url(#gap-mask-${i})`} cx="100" cy="100" r={r} fill="none" stroke="#1757f2" strokeWidth="10" />
-                  <rect className="part-rect" x="85" y="100" width="131" height="0" fill="#fffad6" />
-                </g>
-              );
-            })}
+          <defs>
+            <mask id="gap-mask">
+              <rect x="-20" y="-20" width="240" height="240" fill="white" />
+              <rect x="85" y="84" width="130" height="32" fill="black" />
+            </mask>
+          </defs>
+          <g mask="url(#gap-mask)">
+            <circle className="intro-ring" cx="100" cy="100" r="32" fill="none" stroke="#1757f2" strokeWidth="10" />
+            <circle className="intro-ring" cx="100" cy="100" r="48" fill="none" stroke="#1757f2" strokeWidth="10" />
+            <circle className="intro-ring" cx="100" cy="100" r="64" fill="none" stroke="#1757f2" strokeWidth="10" />
+            <circle className="intro-ring" cx="100" cy="100" r="80" fill="none" stroke="#1757f2" strokeWidth="10" />
+            <circle className="intro-ring" cx="100" cy="100" r="96" fill="none" stroke="#1757f2" strokeWidth="10" />
           </g>
           <text className="intro-wordmark" x="82" y="100" textAnchor="start" dominantBaseline="central" fontFamily="var(--font-dm-sans), DM Sans, sans-serif" fontWeight="900" fontSize="30" fill="#000" stroke="#000" strokeWidth="0.7" paintOrder="stroke" letterSpacing="0">CASEVA</text>
         </svg>
-        </div>
-        {/* Rolling odometer counter (000 → 100%) */}
-        <div className="intro-counter" aria-hidden="true">
-          <CounterDigits />
-        </div>
       </div>
 
       {/* ============ PROMO BAR ============ */}
       <div className="promo-bar" role="region" aria-label="Promotion">
-        <span aria-hidden="true">✦</span>
-        <span>Free shipping on orders $30+ · Buy 2, get 1 free</span>
-        <span aria-hidden="true">✦</span>
+        <span aria-hidden="true">Γ£ª</span>
+        <span>Free shipping on orders $30+ ┬╖ Buy 2, get 1 free</span>
+        <span aria-hidden="true">Γ£ª</span>
       </div>
 
       {/* ============ NAV ============ */}
@@ -743,8 +505,14 @@ export default function Home() {
 
         <div className="hero-content">
           <h1 className="headline left-align">
-            Phone cases pretty enough<br className="desktop-br" />{" "}to keep on.
+            Phone cases pretty enough<br />to keep on.
           </h1>
+
+          <p className="hero-sub">
+            <strong>$24</strong> and up. Fits every iPhone 12 to 16 Pro Max.
+            <br />
+            We ship free.
+          </p>
 
           <div className="model-selector" ref={modelMenuRef}>
             <button
@@ -799,6 +567,13 @@ export default function Home() {
             </a>
           </div>
 
+          <ul className="hero-trust-strip" aria-label="Buyer reassurance">
+            <li>Free shipping</li>
+            <li aria-hidden="true">┬╖</li>
+            <li>30-day returns</li>
+            <li aria-hidden="true">┬╖</li>
+            <li>1-year warranty</li>
+          </ul>
         </div>
 
         <div className="cases" suppressHydrationWarning>
@@ -938,7 +713,7 @@ export default function Home() {
               &ldquo;CASEVA hits the sweet spot between fashion accessory and serious protection.
               I haven&rsquo;t taken mine off since.&rdquo;
             </p>
-            <div className="attribution">— Featured in Cosmopolitan</div>
+            <div className="attribution">ΓÇö Featured in Cosmopolitan</div>
           </div>
         </div>
       </section>
@@ -970,7 +745,7 @@ export default function Home() {
             {reviews.map((r, i) => (
               <div className="review" key={r.author} style={{ opacity: i === 0 ? 1 : 0 }}>
                 <p className="review-quote">&ldquo;{r.quote}&rdquo;</p>
-                <div className="review-author">— {r.author}</div>
+                <div className="review-author">ΓÇö {r.author}</div>
               </div>
             ))}
           </div>
@@ -1003,7 +778,7 @@ export default function Home() {
             <a href="#">Press</a>
           </div>
         </div>
-        <div className="container footer-bottom">© 2026 CASEVA. All rights reserved.</div>
+        <div className="container footer-bottom">┬⌐ 2026 CASEVA. All rights reserved.</div>
       </footer>
     </div>
   );
