@@ -187,6 +187,16 @@ export default function Home() {
     document.querySelector("#collection")?.scrollIntoView({ block: "start" });
   };
 
+  // The scroll colour-wash paints document.body's background inline. Clear it
+  // when this page unmounts so navigating to another route (e.g. a product
+  // page) doesn't inherit whatever wash colour was showing — the body falls
+  // back to the CSS site cream (#fbf3dc), which matches the header.
+  useEffect(() => {
+    return () => {
+      document.body.style.backgroundColor = "";
+    };
+  }, []);
+
   useGSAP(
     () => {
       // ============ HERO ANIMATIONS (reduced-motion-aware) ============

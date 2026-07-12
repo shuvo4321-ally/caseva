@@ -1438,7 +1438,7 @@ input:focus-visible {
 }
 
 .product-row-card {
-  flex: 0 0 320px; /* Widened for CASETiFY card styling */
+  flex: 0 0 400px; /* Widened for CASETiFY card styling */
   scroll-snap-align: start;
   height: auto; /* Allow track to stretch this */
 }
@@ -2839,7 +2839,7 @@ input:focus-visible {
   }
 
   .product-row-card {
-    flex: 0 0 280px; /* Smaller card size on mobile */
+    flex: 0 0 340px; /* Wider card size on mobile */
   }
 
   .collection-price {
