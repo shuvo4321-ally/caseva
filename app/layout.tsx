@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
-import { DM_Sans, Fraunces, Caveat } from "next/font/google";
+import { DM_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
+import { CartProvider } from "./cart-context";
+import PromoBar from "./components/PromoBar";
+import Nav from "./components/Nav";
+import Footer from "./components/Footer";
+import CartDrawer from "./components/CartDrawer";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -14,15 +19,25 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
 });
 
-const caveat = Caveat({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-caveat",
-});
-
 export const metadata: Metadata = {
-  title: "CASEVA — Your Paradise, Case by Case"
+  title: "CASEVA — Your Paradise, Case by Case",
+  description:
+    "Designer iPhone cases pretty enough to keep on. Impact-tested protection, 100% recycled materials, MagSafe ready — from $32.",
+  openGraph: {
+    title: "CASEVA — Your Paradise, Case by Case",
+    description:
+      "Designer iPhone cases pretty enough to keep on. Impact-tested protection, 100% recycled materials, MagSafe ready.",
+    type: "website",
+    images: ["/cream-floral-case-v2.png"],
+  },
+};
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  /* No maximumScale / userScalable lock — pinch-zoom must stay available
+     (WCAG 1.4.4; shoppers zoom product photos). */
+  themeColor: "#fbf3dc",
 };
 
 export default function RootLayout({
@@ -32,7 +47,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${fraunces.variable}`} suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <CartProvider>
+          <a href="#main" className="skip-link">Skip to content</a>
+          <PromoBar />
+          <Nav />
+          {children}
+          <Footer />
+          <CartDrawer />
+        </CartProvider>
+      </body>
     </html>
   );
 }
