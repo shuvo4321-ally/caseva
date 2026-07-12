@@ -982,54 +982,73 @@ export default function Home() {
           });
         });
 
-        // ----- Gradual full-page background color wash via per-section ScrollTriggers -----
-        gsap.set(document.body, { backgroundColor: "#fbf3dc" }); // unified site cream
-        const sectionColors: Array<{ sel: string; color: string; start?: string; end?: string }> = [
-          // On mobile, .hero uses an exact-fit `min-height: calc(100dvh - 92px)`,
-          // which puts .value-prop's top EXACTLY at the viewport's bottom edge at
-          // rest. That's a razor's-edge boundary — a mobile address-bar resize,
-          // font-load reflow, or sub-pixel rounding can tip its ScrollTrigger into
-          // "already active" before the user scrolls at all, blending body's
-          // background away from cream while the (static) header stays cream —
-          // exactly the hero/header color mismatch this was built to prevent.
-          // "-=100" pulls the trigger's reference line 100px UP from the literal
-          // viewport bottom (i.e. further inside the visible viewport), so the
-          // element's top has to travel meaningfully further before it's considered
-          // "started" — a real, unambiguous scroll buffer that can't misfire at rest.
-          { sel: ".value-prop", color: "#b2cdff", start: "top bottom-=100" }, // blue
-          { sel: ".cheers", color: "#fce5e5" },           // soft pink
-          { sel: ".collection-wrap", color: "#fbf3dc" },  // cream
-          { sel: ".comparison", color: "#cbe8ce" },       // light sage — same light-pastel logic as blue/pink above
-          { sel: ".testimonial", color: "#fbf3dc" },      // cream
-          { sel: ".subscribe", color: "#e2dbf7" },        // light lavender — same light logic, was deep indigo
-          { sel: ".press", color: "#ffffff" },            // white
-          // Footer is the LAST section — the page simply doesn't have enough
-          // scrollable height below it for "top 40%" to ever be reachable (that
-          // end position requires more total page height than exists past the
-          // last element). Without more scroll room to satisfy it, the wash gets
-          // stuck at a fixed fraction of progress and can never fully resolve to
-          // the target color. "bottom bottom" instead completes exactly when the
-          // footer's own bottom edge reaches the viewport's bottom — which DOES
-          // land at the true max scroll position, since footer is the last thing
-          // on the page.
-          { sel: ".footer", color: "#f3ead2", end: "bottom bottom" }, // warm light sand — was near-black
+        // ----- Full-page background colour wash -----
+        // Drive document.body's background from a SINGLE scroll-mapped function
+        // rather than one scrub tween per section. The old approach layered
+        // independent tweens on the same property with overwrite:"auto", so
+        // scrolling down killed the previous tween and scrolling back UP had
+        // nothing left to reverse — the colour snapped instead of easing. A pure
+        // interpolation of scroll position is identical (and smooth) both ways.
+        const CREAM = "#fbf3dc";
+        const wash: Array<{ sel: string; color: string; at?: number }> = [
+          { sel: ".value-prop", color: "#b2cdff" },      // blue
+          { sel: ".cheers", color: "#fce5e5" },          // soft pink
+          { sel: ".collection-wrap", color: CREAM },     // cream
+          // "CASEVA Standard" carousel keeps its CASETiFY grey; a higher `at`
+          // greys the body a little later so the cream bento tiles above are
+          // mostly scrolled off before it engages.
+          { sel: ".product-row", color: "#e5e5e5", at: 0.25 }, // CASETiFY grey
+          { sel: ".comparison", color: "#cbe8ce" },      // light sage
+          { sel: ".testimonial", color: CREAM },         // cream
+          { sel: ".subscribe", color: "#e2dbf7" },       // light lavender
+          { sel: ".press", color: "#ffffff" },           // white
+          { sel: ".footer", color: "#f3ead2" },          // warm light sand
         ];
-        sectionColors.forEach(({ sel, color, start, end }) => {
-          const target = document.querySelector(sel);
-          if (!target) return;
-          gsap.to(document.body, {
-            backgroundColor: color,
-            ease: "none",
-            immediateRender: false,
-            overwrite: "auto",
-            scrollTrigger: {
-              trigger: target,
-              start: start || "top bottom",
-              end: end || "top 40%",
-              // Mobile: lock to scroll (numeric scrub = post-gesture color creep)
-              scrub: window.innerWidth <= 640 ? true : 0.5,
-            },
-          });
+        // Colour "stops" keyed by absolute scroll position; rebuilt on refresh
+        // so it survives layout changes (image load, resize, intro hand-off).
+        let stops: Array<{ y: number; color: string }> = [];
+        const buildStops = () => {
+          const maxY = ScrollTrigger.maxScroll(window);
+          stops = wash
+            .map((w) => {
+              const el = document.querySelector(w.sel);
+              if (!el) return null;
+              const top = el.getBoundingClientRect().top + window.scrollY;
+              // colour is fully reached when the section top hits `at`·viewport
+              const y = gsap.utils.clamp(0, maxY, top - window.innerHeight * (w.at ?? 0.4));
+              return { y, color: w.color };
+            })
+            .filter((s): s is { y: number; color: string } => s !== null)
+            .sort((a, b) => a.y - b.y);
+          // open on cream at the very top of the page
+          if (!stops.length || stops[0].y > 0) stops.unshift({ y: 0, color: CREAM });
+        };
+        const colorAt = (y: number): string => {
+          if (y <= stops[0].y) return stops[0].color;
+          const last = stops[stops.length - 1];
+          if (y >= last.y) return last.color;
+          let i = 0;
+          while (i < stops.length - 1 && stops[i + 1].y <= y) i++;
+          // hold stops[i].color, then ease to the next over the last ~0.6·viewport
+          const segEnd = stops[i + 1].y;
+          const transStart = Math.max(stops[i].y, segEnd - window.innerHeight * 0.6);
+          if (y <= transStart) return stops[i].color;
+          const t = (y - transStart) / (segEnd - transStart);
+          return gsap.utils.interpolate(stops[i].color, stops[i + 1].color, t) as string;
+        };
+        const paintWash = () => {
+          document.body.style.backgroundColor = colorAt(window.scrollY);
+        };
+        buildStops();
+        paintWash();
+        ScrollTrigger.create({
+          start: 0,
+          end: () => ScrollTrigger.maxScroll(window),
+          onUpdate: paintWash,
+          onRefresh: () => {
+            buildStops();
+            paintWash();
+          },
         });
 
         // ----- Press: auto-rotate reviews -----
@@ -1282,80 +1301,6 @@ export default function Home() {
         {/* ============ COLLECTION (carousel on desktop, tiles on mobile) ============ */}
         {/* Renders its own <section.collection-wrap id="collection">. */}
         <CollectionShowcase />
-
-        {/* ============ COMPARISON ============ */}
-        <section className="comparison" id="compare">
-          <div className="container">
-            <h2 className="reveal headline">Why CASEVA?</h2>
-            <div className="compare-grid">
-              <div className="compare-col us">
-                <div className="compare-tag">CASEVA</div>
-                <div className="compare-stat">
-                  <span className="count" data-value="12">0</span>
-                  <span className="compare-unit">ft drop tested</span>
-                </div>
-                <div className="compare-stat">
-                  <span className="count" data-value="100">0</span>
-                  <span className="compare-unit">% recycled materials</span>
-                </div>
-                <div className="compare-stat">
-                  <span className="count" data-value="2">0</span>
-                  <span className="compare-unit">year warranty</span>
-                </div>
-              </div>
-              <div className="compare-col them">
-                <div className="compare-tag">Other Cases</div>
-                <div className="compare-stat">
-                  <span>4</span>
-                  <span className="compare-unit">ft drop tested</span>
-                </div>
-                <div className="compare-stat">
-                  <span>0</span>
-                  <span className="compare-unit">% recycled materials</span>
-                </div>
-                <div className="compare-stat">
-                  <span>30</span>
-                  <span className="compare-unit">day warranty</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============ TESTIMONIAL ============ */}
-        <section className="testimonial">
-          <div className="container testimonial-inner">
-            <div className="testimonial-image reveal">
-              <Image src="/cream-floral-case-v2.png" alt="Cream floral iPhone case" width={360} height={540} />
-            </div>
-            <div className="testimonial-text reveal">
-              <p className="quote">
-                &ldquo;CASEVA hits the sweet spot between fashion accessory and serious protection.
-                I haven&rsquo;t taken mine off since.&rdquo;
-              </p>
-              <div className="attribution">— Featured in Cosmopolitan</div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============ SUBSCRIBE ============ */}
-        <section className="subscribe" id="subscribe">
-          <div className="container subscribe-inner">
-            <div className="subscribe-text">
-              <h2 className="reveal headline">Never miss a drop.</h2>
-              <ul className="subscribe-list reveal">
-                <li>Save 15% on every order</li>
-                <li>Free shipping, always</li>
-                <li>Early access to new collections</li>
-                <li>Swap designs anytime</li>
-              </ul>
-              <button className="reveal cta">Subscribe</button>
-            </div>
-            <div className="subscribe-image reveal">
-              <Image src="/rose-case-v2.png" alt="Rose pattern iPhone case" width={300} height={450} />
-            </div>
-          </div>
-        </section>
 
         {/* ============ PRESS ============ */}
         <section className="press" id="press">

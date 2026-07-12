@@ -29,28 +29,16 @@ export default function ProductCard({ product, className = "" }: { product: Prod
   };
 
   return (
-    <div className={`collection-card ${className}`}>
+    <div className={`casetify-style ${className}`}>
       <Link className="collection-card-link" href={`/product/${product.slug}`}>
-        <div className="collection-img-wrap">
+        <div className="casetify-img-bg">
           {product.isNew && <span className="card-badge">NEW</span>}
           {product.salePrice && <span className="card-badge card-badge-sale">SALE</span>}
-          <div className="collection-img">
-            <Image src={product.images[0]} alt={product.alt} width={360} height={540} />
-          </div>
-          <button
-            type="button"
-            className={`collection-add ${added ? "is-added" : ""}`}
-            onClick={(e) => {
-              e.preventDefault();
-              onAdd();
-            }}
-          >
-            {added ? "Added ✓" : "+ Quick Add"}
-          </button>
+          <Image src={product.images[0]} alt={product.alt} width={360} height={540} />
         </div>
-        <div className="collection-meta">
-          <span className="collection-name">{product.name}</span>
-          <span className="collection-price">
+        <div className="casetify-card-body">
+          <h3 className="casetify-title">{product.name}</h3>
+          <span className="casetify-subtitle">
             {product.salePrice ? (
               <>
                 <span className="price-now">{formatPrice(product.salePrice)}</span>
@@ -60,6 +48,17 @@ export default function ProductCard({ product, className = "" }: { product: Prod
               formatPrice(product.price)
             )}
           </span>
+          <p className="casetify-desc">{product.description}</p>
+          <button
+            type="button"
+            className={`casetify-shop-btn ${added ? "is-added" : ""}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onAdd();
+            }}
+          >
+            {added ? "Added ✓" : "Shop Now"}
+          </button>
         </div>
       </Link>
     </div>

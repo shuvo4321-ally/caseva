@@ -87,7 +87,7 @@ input:focus-visible {
 }
 
 .container {
-  max-width: 1180px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 40px;
 }
@@ -987,7 +987,7 @@ input:focus-visible {
     flex-direction: column !important;
     height: auto !important;
     gap: 0;
-    padding: 0 0 12vw 0;
+    padding: 0; /* Reduced vertical gap */
     margin-top: -120px;
   }
   .cheers-case {
@@ -1041,9 +1041,10 @@ input:focus-visible {
 .showcase-bento {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 200px;
+  grid-auto-rows: 260px; /* Increased from 200px */
   gap: 20px;
   margin-bottom: 44px;
+  padding: 0 12px; /* Minimal padding */
 }
 
 .showcase-tile {
@@ -1213,55 +1214,61 @@ input:focus-visible {
   gap: 50px;
 }
 
-.collection-card {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  transition: transform 0.2s ease;
-}
-
-.collection-card:hover {
-  transform: translateY(-4px);
-}
-
-.collection-img-wrap {
-  position: relative;
-  width: 100%;
-  margin-bottom: 16px;
+.casetify-style {
+  background: #fff;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-  background: #fff;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
 }
 
-.collection-card:hover .collection-img-wrap {
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+.casetify-style:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
 
-.collection-img {
+/* Card link wrapper */
+.collection-card-link {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
   width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.casetify-img-bg {
+  position: relative;
+  background: #f0f0f0;
   padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.casetify-img-bg img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: contain;
+  display: block;
   transition: transform 0.4s ease;
 }
 
-.collection-card:hover .collection-img {
+.casetify-style:hover .casetify-img-bg img {
   transform: scale(1.04);
 }
 
-.collection-img img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* NEW / SALE Badges */
+/* Badges */
 .card-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 12px;
+  left: 12px;
   z-index: 2;
-  background: #2540ad;
+  background: #111;
   color: #fff;
   font-size: 11px;
   font-weight: 800;
@@ -1272,69 +1279,33 @@ input:focus-visible {
 
 .card-badge-sale {
   left: auto;
-  right: 10px;
+  right: 12px;
+  background: #e91e63;
 }
 
-/* Quick Add Button Overlay */
-.collection-add {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: #111;
-  border: none;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
-  padding: 16px 20px;
-  font-family: inherit;
-  font-weight: 700;
-  font-size: 15px;
-  cursor: pointer;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, color 0.2s ease;
-  z-index: 3;
-}
-
-.collection-card:hover .collection-add {
-  transform: translateY(0);
-}
-
-.collection-add:hover,
-.collection-add.is-added {
-  background: #2540ad;
-  color: #fff;
-}
-
-.collection-add:active {
-  background: #1c3580;
-}
-
-/* Meta: Stacked & Left-Aligned */
-.collection-meta {
+.casetify-card-body {
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-  padding: 0 4px;
+  flex-grow: 1;
 }
 
-.collection-name {
+.casetify-title {
   font-family: var(--font-fraunces), serif;
+  font-size: 20px;
   font-weight: 800;
-  font-size: 19px;
   color: #111;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
-.collection-price {
+.casetify-subtitle {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
-  font-size: 16px;
-  color: #555;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 12px;
 }
 
 .price-was {
@@ -1347,20 +1318,50 @@ input:focus-visible {
   color: #2540ad;
 }
 
-/* Card link wrapper */
-.collection-card-link {
-  display: block;
-  width: 100%;
-  text-decoration: none;
+.casetify-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.casetify-shop-btn {
+  background: #fff;
+  border: 1px solid #111;
+  color: #111;
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: all 0.2s;
+}
+
+.casetify-shop-btn:hover {
+  background: #111;
+  color: #fff;
+}
+
+.casetify-shop-btn.is-added {
+  background: #2540ad;
+  border-color: #2540ad;
+  color: #fff;
 }
 
 /* ============ PRODUCT ROW (curated carousel) ============ */
 /* padding trimmed vs. a standalone row — these stack inside .collection-wrap.
    scroll-margin-top so tile jumps land the heading below the sticky nav. */
 .product-row {
-  padding: 40px 0;
+  padding: 60px 0;
   position: relative;
   scroll-margin-top: 96px;
+  /* Transparent — the CASETiFY-grey is applied to the page body by the
+     scroll color-wash (see page.tsx sectionColors), so it eases in/out of
+     the surrounding cream instead of hard-cutting at the section edge. */
+  background: transparent;
 }
 
 .product-row-head {
@@ -1370,16 +1371,28 @@ input:focus-visible {
   margin-bottom: 34px;
 }
 
+.product-row-title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
 .product-row-title {
   font-family: var(--font-fraunces), serif;
   font-weight: 900;
-  font-size: 44px;
+  font-size: 40px;
   color: #111;
+  margin-bottom: 8px;
+}
+
+.product-row-subtitle {
+  font-size: 16px;
+  color: #333;
+  max-width: 600px;
+  line-height: 1.5;
 }
 
 .product-row-nav {
-  display: flex;
-  gap: 10px;
+  display: none; /* Replaced by the new footer nav */
 }
 
 .row-chevron {
@@ -1425,8 +1438,74 @@ input:focus-visible {
 }
 
 .product-row-card {
-  flex: 0 0 260px;
+  flex: 0 0 320px; /* Widened for CASETiFY card styling */
   scroll-snap-align: start;
+  height: auto; /* Allow track to stretch this */
+}
+
+.product-row-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  position: relative;
+}
+
+.product-row-dots {
+  display: flex;
+  gap: 12px;
+}
+
+.row-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(37, 64, 173, 0.25); /* Faded blue for inactive dots */
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: width 0.3s ease, border-radius 0.3s ease, background 0.3s ease;
+}
+
+.row-dot.is-active {
+  width: 24px;
+  border-radius: 4px;
+  background: #2540ad; /* Brand blue for active dot */
+}
+
+.product-row-nav {
+  position: absolute;
+  right: 40px;
+  display: flex;
+  gap: 12px;
+}
+
+.row-arrow {
+  width: 74px; /* Pill shape */
+  height: 50px;
+  border-radius: 30px;
+  background: #2540ad; /* Brand blue */
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.row-arrow svg {
+  width: 22px;
+  height: 22px;
+}
+
+.row-arrow.is-disabled {
+  background: rgba(37, 64, 173, 0.3); /* Muted blue */
+  cursor: default;
+}
+
+.row-arrow:not(.is-disabled):hover {
+  background: #1e338a; /* Darker blue on hover */
 }
 
 /* ============ COMPARISON ============ */
@@ -2666,6 +2745,10 @@ input:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .collection-wrap {
+    padding: 20px 0 80px; /* Substantially reduced top gap for mobile */
+  }
+
   .collection-title {
     font-size: 30px;
     margin-bottom: 18px;
@@ -2688,7 +2771,7 @@ input:focus-visible {
   .showcase-tile--feature {
     grid-column: span 2;
     grid-row: span 1;
-    height: 230px;
+    height: 300px; /* Increased from 230px */
   }
 
   .showcase-tile--feature .showcase-tile-label {
@@ -2700,7 +2783,7 @@ input:focus-visible {
   }
 
   .showcase-tile--half {
-    height: 188px;
+    height: 230px; /* Increased from 188px */
   }
 
   .showcase-tile--half .showcase-tile-label {
@@ -2714,7 +2797,7 @@ input:focus-visible {
 
   .showcase-tile--full {
     grid-column: span 2;
-    height: 166px;
+    height: 210px; /* Increased from 166px */
   }
 
   .showcase-tile--full .showcase-tile-media {
@@ -2743,12 +2826,20 @@ input:focus-visible {
   .collection-meta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
+    gap: 4px;
     padding: 0 4px;
+  }
+
+  .product-row-nav {
+    display: none !important;
   }
 
   .collection-name {
     font-size: 16px;
+  }
+
+  .product-row-card {
+    flex: 0 0 280px; /* Smaller card size on mobile */
   }
 
   .collection-price {

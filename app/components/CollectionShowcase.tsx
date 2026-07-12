@@ -29,45 +29,48 @@ const shelfProducts = (tag: FilterTag) =>
 
 export default function CollectionShowcase() {
   const jump = (tag: FilterTag) =>
-    document.getElementById(`shelf-${tag}`)?.scrollIntoView({ block: "start" });
+    document.getElementById(`all-products`)?.scrollIntoView({ block: "start" });
 
   return (
     <section className="collection-wrap" id="collection">
       <div className="container">
         <h2 className="collection-title reveal">The Collection</h2>
-
-        {/* Tile mosaic — jumps to the matching carousel below */}
-        <div className="showcase-bento reveal">
-          {SHOWCASE_TILES.map((t) => (
-            <button
-              key={t.tag}
-              type="button"
-              className={`showcase-tile showcase-tile--${tileSize(t.tag)} showcase-tile--${t.accent}`}
-              onClick={() => jump(t.tag)}
-              aria-label={`Jump to ${t.label} — ${filterCount(t.tag)} designs`}
-            >
-              <div className="showcase-tile-media">
-                <Image src={t.image} alt="" width={300} height={450} draggable={false} />
-              </div>
-              <div className="showcase-tile-body">
-                <span className="showcase-tile-label">{t.label}</span>
-                <span className="showcase-tile-count">{filterCount(t.tag)} designs</span>
-                <span className="showcase-tile-cta">
-                  Shop
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
       </div>
 
-      {/* One swipeable product carousel per collection */}
-      {SHELVES.map((s) => (
-        <ProductRow key={s.tag} id={`shelf-${s.tag}`} title={s.title} products={shelfProducts(s.tag)} />
-      ))}
+      {/* Tile mosaic — jumps to the matching carousel below */}
+      <div className="showcase-bento reveal">
+        {SHOWCASE_TILES.map((t) => (
+          <button
+            key={t.tag}
+            type="button"
+            className={`showcase-tile showcase-tile--${tileSize(t.tag)} showcase-tile--${t.accent}`}
+            onClick={() => jump(t.tag)}
+            aria-label={`Jump to ${t.label} — ${filterCount(t.tag)} designs`}
+          >
+            <div className="showcase-tile-media">
+              <Image src={t.image} alt="" width={300} height={450} draggable={false} />
+            </div>
+            <div className="showcase-tile-body">
+              <span className="showcase-tile-label">{t.label}</span>
+              <span className="showcase-tile-count">{filterCount(t.tag)} designs</span>
+              <span className="showcase-tile-cta">
+                Shop
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* A single swipeable product carousel for all products */}
+      <ProductRow
+        id="all-products"
+        title="The CASEVA Standard"
+        subtitle="Real life happens. CASEVA has your back, proving protection that rises to meet your life."
+        products={allProductsSorted()}
+      />
     </section>
   );
 }
