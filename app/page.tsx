@@ -1271,10 +1271,10 @@ export default function Home() {
         <section className="cheers" id="benefits">
           <div className="cheers-stage">
             <div className="cheers-case left">
-              <Image src="/cheers-new-1.png" alt="Hand holding new case 1" width={420} height={630} />
+              <Image src="/cheers-v3-1.png" alt="Hand holding new case 1" width={420} height={630} />
             </div>
             <div className="cheers-case right">
-              <Image src="/cheers-new-2.png" alt="Hand holding new case 2" width={420} height={630} />
+              <Image src="/cheers-v3-2.png" alt="Hand holding new case 2" width={420} height={630} />
             </div>
           </div>
         </section>
