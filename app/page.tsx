@@ -209,18 +209,19 @@ export default function Home() {
                 y: isMobileFan ? dataY * 0.2 : dataY,
                 rotate: baseRotate * 1.5,
                 ease: "none",
+                force3D: true, // own GPU layer — transforms composite instead of repaint
                 scrollTrigger: {
                   trigger: ".hero",
                   start: "top top",
                   end: "bottom top",
-                  // Mobile is hard-locked to scroll position (scrub: true).
-                  // Any numeric scrub is a lerp that keeps animating AFTER the
-                  // gesture ends — at this tiny amplitude (~7px) that catch-up
-                  // read as free-floating vertical drift on a real device
-                  // (reported at 1.2; 2 was worse). Locked 1:1, motion stops
-                  // the instant scrolling stops; momentum flings still move
-                  // the cases but in sync with the page, which reads natural.
-                  scrub: isMobileFan ? true : 0.6,
+                  // Mobile was hard-locked (scrub: true), which snaps straight
+                  // to each scroll position — a fast fling arrives as coarse
+                  // jumps, so the fan visibly stepped. A SMALL numeric scrub
+                  // smooths those deltas. Earlier attempts used large values
+                  // (1.2 / 2) whose long catch-up read as free-floating drift
+                  // after the finger lifted; 0.3 settles in ~a fifth of that,
+                  // fast enough to feel locked while still filtering the jerk.
+                  scrub: isMobileFan ? 0.3 : 0.6,
                 },
               }
             );
@@ -999,8 +1000,16 @@ export default function Home() {
           const t = (y - transStart) / (segEnd - transStart);
           return gsap.utils.interpolate(stops[i].color, stops[i + 1].color, t) as string;
         };
+        // Only touch the DOM when the colour actually changes. The wash holds a
+        // flat colour for long stretches (the whole hero, for one), and writing
+        // body.backgroundColor on every scroll tick repaints the full page
+        // background each frame — a real source of scroll jank on phones.
+        let lastWash = "";
         const paintWash = () => {
-          document.body.style.backgroundColor = colorAt(window.scrollY);
+          const next = colorAt(window.scrollY);
+          if (next === lastWash) return;
+          lastWash = next;
+          document.body.style.backgroundColor = next;
         };
         buildStops();
         paintWash();
@@ -1010,6 +1019,7 @@ export default function Home() {
           onUpdate: paintWash,
           onRefresh: () => {
             buildStops();
+            lastWash = ""; // stops moved — force a repaint even if the colour matches
             paintWash();
           },
         });
