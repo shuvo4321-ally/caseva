@@ -42,7 +42,7 @@ export default function CartDrawer() {
         {items.length === 0 ? (
           <div className="cart-empty">
             <p>Your cart is empty.</p>
-            <Link className="cta" href="/#collection" onClick={closeDrawer}>Shop the Collection</Link>
+            <Link className="cta" href="/shop" onClick={closeDrawer}>Shop the Collection</Link>
           </div>
         ) : (
           <>

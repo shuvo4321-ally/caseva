@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { useCart } from "../cart-context";
 import { type Product, DEFAULT_MODEL, formatPrice } from "../data/products";
 
-// Shoppable product card: links to the PDP, with a quick Add to Cart that
-// adds the default device (shoppers refine the model on the product page).
+// Shoppable product card (home carousels): links to the PDP, with a quick Add
+// to Cart that adds the default device (shoppers refine the model on the PDP).
 export default function ProductCard({ product, className = "" }: { product: Product; className?: string }) {
   const { addItem, openDrawer } = useCart();
   const [added, setAdded] = useState(false);
@@ -32,8 +32,6 @@ export default function ProductCard({ product, className = "" }: { product: Prod
     <div className={`casetify-style ${className}`}>
       <Link className="collection-card-link" href={`/product/${product.slug}`}>
         <div className="casetify-img-bg">
-          {product.isNew && <span className="card-badge">NEW</span>}
-          {product.salePrice && <span className="card-badge card-badge-sale">SALE</span>}
           <Image src={product.images[0]} alt={product.alt} width={360} height={540} />
         </div>
         <div className="casetify-card-body">

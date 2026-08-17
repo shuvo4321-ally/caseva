@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "../cart-context";
 import ProductRow from "./ProductRow";
+import ModelSelector from "./ModelSelector";
 import {
   type Product,
   PHONE_MODELS,
-  DEFAULT_MODEL,
   MODEL_STORAGE_KEY,
   formatPrice,
 } from "../data/products";
@@ -25,9 +25,7 @@ export default function ProductDetail({
 
   const [activeImage, setActiveImage] = useState(0);
   const [qty, setQty] = useState(1);
-  const [model, setModel] = useState(DEFAULT_MODEL);
-  const [modelOpen, setModelOpen] = useState(false);
-  const modelRef = useRef<HTMLDivElement>(null);
+  const [model, setModel] = useState(""); // unselected until the shopper picks brand + model
 
   const unitPrice = product.salePrice ?? product.price;
 
@@ -39,23 +37,8 @@ export default function ProductDetail({
     } catch { /* ignore */ }
   }, []);
 
-  useEffect(() => {
-    if (!modelOpen) return;
-    const onDown = (e: MouseEvent) => {
-      if (modelRef.current && !modelRef.current.contains(e.target as Node)) setModelOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setModelOpen(false); };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [modelOpen]);
-
   const pickModel = (m: string) => {
     setModel(m);
-    setModelOpen(false);
     try { window.localStorage.setItem(MODEL_STORAGE_KEY, m); } catch { /* ignore */ }
   };
 
@@ -67,8 +50,8 @@ export default function ProductDetail({
     model,
   });
 
-  const onAdd = () => { addItem(line(), qty); openDrawer(); };
-  const onBuyNow = () => { addItem(line(), qty); router.push("/checkout"); };
+  const onAdd = () => { if (!model) return; addItem(line(), qty); openDrawer(); };
+  const onBuyNow = () => { if (!model) return; addItem(line(), qty); router.push("/checkout"); };
 
   return (
     <main id="main" tabIndex={-1} className="pdp-page">
@@ -114,45 +97,12 @@ export default function ProductDetail({
           </div>
           <p className="pdp-desc">{product.description}</p>
 
-          {/* Model selector — same styled listbox as the hero */}
-          <div className="model-selector pdp-model" ref={modelRef}>
-            <button
-              type="button"
-              className="model-trigger"
-              aria-haspopup="listbox"
-              aria-expanded={modelOpen}
-              aria-label={`For ${model}. Click to change phone model.`}
-              onClick={() => setModelOpen((v) => !v)}
-            >
-              <svg className="model-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <rect x="6" y="2" width="12" height="20" rx="2" />
-                <line x1="11" y1="18" x2="13" y2="18" />
-              </svg>
-              <span className="model-label">
-                <span className="model-prefix">For</span>
-                <span className="model-value">{model}</span>
-              </span>
-              <svg className={`model-chevron ${modelOpen ? "is-open" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </button>
-            {modelOpen && (
-              <ul className="model-menu" role="listbox" aria-label="iPhone models">
-                {PHONE_MODELS.map((m) => (
-                  <li key={m} role="option" aria-selected={m === model}>
-                    <button type="button" className={`model-option ${m === model ? "is-selected" : ""}`} onClick={() => pickModel(m)}>
-                      {m}
-                      {m === model && (
-                        <svg className="model-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          {/* Model selector — brand → model drill-down (shared with the hero) */}
+          <ModelSelector value={model} onChange={pickModel} prefix="For" className="pdp-model" />
+
+          {!model && (
+            <p className="pdp-model-hint">Choose your phone above to add this case to your cart.</p>
+          )}
 
           {/* Quantity + actions */}
           <div className="pdp-actions">
@@ -161,9 +111,9 @@ export default function ProductDetail({
               <span aria-live="polite">{qty}</span>
               <button type="button" aria-label="Increase quantity" onClick={() => setQty((q) => q + 1)}>+</button>
             </div>
-            <button type="button" className="cta pdp-add" onClick={onAdd}>Add to Cart</button>
+            <button type="button" className="cta pdp-add" onClick={onAdd} disabled={!model}>Add to Cart</button>
           </div>
-          <button type="button" className="pdp-buy" onClick={onBuyNow}>Buy Now</button>
+          <button type="button" className="pdp-buy" onClick={onBuyNow} disabled={!model}>Buy Now</button>
 
           <ul className="pdp-perks">
             <li>Impact-tested drop protection</li>

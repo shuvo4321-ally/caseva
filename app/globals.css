@@ -13,9 +13,12 @@
 html,
 body {
   overflow-x: hidden;
-  background-color: #fbf3dc;
-  /* site cream — header/hero; loader panel uses its own #fffad6 */
 }
+/* NOTE: the background lives on <body> ONLY (see the body rule below), never
+   on <html>. body's background propagates to the page canvas, so it also
+   covers the overscroll/bottom area. Setting it on <html> too meant the scroll
+   colour-wash (which repaints body) left the html cream showing as a stray
+   strip at the bottom on mobile. */
 
 html {
   scroll-behavior: smooth;
@@ -33,6 +36,8 @@ body {
   color: #111;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  background-color: #fff9d6;
+  /* hero cream — the page opens on this; the scroll wash takes over below */
 }
 
 /* Skip link — visible only when focused (keyboard a11y) */
@@ -97,8 +102,8 @@ input:focus-visible {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(251, 243, 220, 0.85);
-  /* fbf3dc — unified with hero/loader cream */
+  background: rgba(255, 249, 214, 0.85);
+  /* fff9d6 — unified with hero/loader cream */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 10px 0;
@@ -178,7 +183,7 @@ input:focus-visible {
   right: 0;
   display: flex;
   flex-direction: column;
-  background: #fbf3dc;
+  background: #fff9d6;
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.25s ease;
@@ -630,6 +635,12 @@ input:focus-visible {
   color: #111;
 }
 
+/* Nothing chosen yet — muted prompt in place of a model name */
+.model-value.is-placeholder {
+  font-weight: 600;
+  color: #6a6a5a;
+}
+
 .model-chevron {
   width: 16px;
   height: 16px;
@@ -1033,6 +1044,138 @@ input:focus-visible {
   color: #111;
 }
 
+/* ============ HOME FEATURE BANNER ============ */
+/* Full-bleed promo band: one photo filling the band with the copy overlaid
+   (see FeatureBanner.tsx for how to swap the photo). */
+.feature-banner {
+  position: relative;
+  min-height: 620px;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 0 68px 6%;
+  margin-bottom: 70px;
+  overflow: hidden;
+}
+
+/* The banner photo — fills the band, cropped to whatever shape it is.
+   The bottom is masked to transparent so the band dissolves into the page
+   colour below instead of ending on a hard horizontal edge. */
+.feature-img {
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* LIGHT scrim — a soft light veil, not a dark one. A dark overlay turned the
+   band into a heavy grey block that clashed with the cream/pastel page; this
+   keeps the photo bright and blended while still lifting the dark copy off it. */
+.feature-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 252, 242, 0.88) 0%,
+    rgba(255, 252, 242, 0.6) 34%,
+    rgba(255, 252, 242, 0.14) 62%,
+    rgba(255, 252, 242, 0) 100%
+  );
+  /* fade the veil out at the bottom too, or it leaves its own cream edge */
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0) 100%);
+}
+
+.feature-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 560px;
+  color: #111;
+}
+
+.feature-eyebrow {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #2540ad;
+  margin-bottom: 10px;
+}
+
+.feature-title {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 900;
+  font-size: clamp(34px, 4.4vw, 58px);
+  line-height: 1.06;
+  margin: 0 0 16px;
+  color: #111;
+}
+
+.feature-desc {
+  font-size: 17px;
+  line-height: 1.6;
+  color: #444;
+  max-width: 500px;
+  margin-bottom: 28px;
+}
+
+.feature-cta {
+  display: inline-flex;
+  align-items: center;
+  background: #111;
+  color: #fff;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 17px;
+  padding: 15px 40px;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.feature-cta:hover { background: #2540ad; transform: translateY(-2px); }
+
+/* ---- Mobile: taller frame, copy overlaid across the bottom ---- */
+@media (max-width: 900px) {
+  .feature-banner {
+    min-height: 0;
+    aspect-ratio: 9 / 13;
+    padding: 0 24px 48px;
+    margin-bottom: 50px;
+  }
+
+  /* Light veil peaks over the mid band (where copy starts on top of the photo)
+     and clears at both ends, so the masked bottom can dissolve cleanly into
+     the page colour. */
+  .feature-banner::after {
+    background: linear-gradient(
+      to top,
+      rgba(255, 252, 242, 0.72) 0%,
+      rgba(255, 252, 242, 0.78) 30%,
+      rgba(255, 252, 242, 0.3) 62%,
+      rgba(255, 252, 242, 0) 100%
+    );
+  }
+
+  /* photo fades out earlier on mobile — the copy occupies the lower half */
+  .feature-img,
+  .feature-banner::after {
+    -webkit-mask-image: linear-gradient(to bottom, #000 52%, rgba(0, 0, 0, 0) 96%);
+    mask-image: linear-gradient(to bottom, #000 52%, rgba(0, 0, 0, 0) 96%);
+  }
+
+  .feature-copy { max-width: none; }
+  .feature-eyebrow { font-size: 14px; }
+  .feature-title { font-size: clamp(30px, 8.2vw, 42px); }
+  .feature-desc { font-size: 16px; margin-bottom: 22px; }
+  .feature-cta { font-size: 16px; padding: 14px 36px; }
+}
+
 /* ============ COLLECTION SHOWCASE (big carousel + filter tabs) ============ */
 /* ============ COLLECTION SHOWCASE (tile mosaic + filter tabs) ============ */
 /* Casetify-style bento: a large feature tile + two small + one wide, filling
@@ -1059,6 +1202,8 @@ input:focus-visible {
   text-align: left;
   cursor: pointer;
   font-family: inherit;
+  text-decoration: none;
+  color: inherit;
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -1242,7 +1387,7 @@ input:focus-visible {
 
 .casetify-img-bg {
   position: relative;
-  background: #f0f0f0;
+  background: transparent;
   padding: 30px;
   display: flex;
   justify-content: center;
@@ -1349,6 +1494,299 @@ input:focus-visible {
   background: #2540ad;
   border-color: #2540ad;
   color: #fff;
+}
+
+/* ============ SHOP PAGE (/shop — catalog, CASEVA DNA) ============ */
+.shop-page {
+  padding: 28px 0 100px;
+}
+
+/* Title banner + grid-zoom */
+.shop-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  /* Exact brand blue of the "Shop the Collection" CTA (.cta) — one solid blue
+     across the site's primary actions and this banner. */
+  background: #2540ad;
+  border-radius: 16px;
+  padding: 16px 24px;
+  margin: 16px 0 20px;
+}
+
+.shop-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shop-title {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 900;
+  font-size: clamp(24px, 4vw, 32px);
+  line-height: 1.2;
+  color: #fff;
+  margin: 0;
+}
+
+/* Filter + Sort toolbar */
+.shop-bar {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px 0 24px;
+}
+
+.shop-dd { position: relative; }
+
+/* Banner buttons (Filter & View Switcher) */
+.banner-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 50px;
+  border: 1.2px solid rgba(255, 255, 255, 0.55);
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.banner-btn:hover { background: rgba(255, 255, 255, 0.12); }
+.filter-icon { width: 16px; height: 16px; }
+
+/* View Switcher */
+.view-switcher {
+  padding: 4px 6px;
+  gap: 4px;
+}
+
+.view-btn {
+  background: transparent;
+  border: none;
+  border-radius: 50px;
+  color: #fff;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-btn.is-active {
+  background: #fff;
+  color: #2540ad;
+}
+
+.view-btn svg { width: 18px; height: 18px; }
+
+/* Sort button */
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: #111;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sort-icon { width: 18px; height: 18px; }
+
+.shop-dd-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 224px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 20;
+}
+
+.shop-dd--right .shop-dd-menu { left: auto; right: 0; }
+
+.shop-dd-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  border: none;
+  background: none;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  cursor: pointer;
+  text-align: left;
+}
+
+.shop-dd-item:hover { background: #f5f3ec; }
+.shop-dd-item.is-active { background: rgba(37, 64, 173, 0.08); color: #2540ad; font-weight: 700; }
+.shop-dd-count { font-size: 12px; font-weight: 700; color: #8a8778; }
+.shop-dd-item.is-active .shop-dd-count { color: #2540ad; }
+
+.shop-count {
+  font-size: 14px;
+  color: #8a8778;
+  margin: 16px 0 20px;
+}
+
+/* Grid — 5 across on wide desktop, scaling down responsively */
+.shop-grid {
+  display: grid;
+  gap: 30px 22px;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.shop-empty {
+  padding: 60px 0;
+  text-align: center;
+  color: #8a8778;
+  font-size: 16px;
+}
+
+/* ---- Flat catalog card (distinct from the home carousel card) ---- */
+.shopcard { display: flex; flex-direction: column; }
+
+.shopcard-media {
+  position: relative;
+  aspect-ratio: 1 / 1.18;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Absolute fill so height:100% resolves against the box (a centered grid item
+   falls back to the image's natural height and gets clipped) — object-fit
+   contain then shows the whole case, padding insets it from the edges. */
+.shopcard-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12px 10px;
+  object-fit: contain;
+  transition: transform 0.35s ease;
+}
+
+.shopcard:hover .shopcard-media img { transform: scale(1.04); }
+
+.shopcard-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.shopcard-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: width 0.2s ease, background 0.2s ease, border-radius 0.2s ease;
+}
+
+.shopcard-dot.is-active { width: 18px; border-radius: 4px; background: #111; }
+
+.shopcard-body {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 2px 0;
+}
+
+.shopcard-name {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #111;
+  text-decoration: none;
+}
+
+.shopcard-name:hover { text-decoration: underline; }
+.shopcard-device { margin-top: 6px; font-size: 14px; line-height: 1.5; color: #6b6b6b; }
+.shopcard-type { font-size: 14px; line-height: 1.5; color: #6b6b6b; }
+
+/* Price is the hero of the text block: brand blue + larger/heavier than the
+   product name, so it reads as a price rather than another line of copy. */
+.shopcard-price {
+  margin-top: 16px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #2540ad;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* the struck original stays quiet so it doesn't compete with the live price */
+.shopcard-price .price-was {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Compact left-aligned pill (like Casetify) — not a full-width bar */
+.shopcard-add {
+  margin-top: 14px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: none;
+  border-radius: 50px;
+  background: #111;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.shopcard-add svg { width: 15px; height: 15px; }
+.shopcard-add:hover { background: #2540ad; }
+.shopcard-add:active { transform: translateY(1px); }
+.shopcard-add.is-added { background: #2540ad; }
+
+@media (max-width: 1280px) {
+  .shop-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 980px) {
+  .shop-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 680px) {
+  .shop-banner { padding: 20px 20px; border-radius: 20px; }
+  .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 22px 12px; }
+  .shop-dd-btn { padding: 10px 15px; font-size: 13px; }
+  /* Quick-add is desktop-only — on a phone the card taps straight through to
+     the product page, where the shopper picks their model before adding. */
+  .shopcard-add { display: none; }
 }
 
 /* ============ PRODUCT ROW (curated carousel) ============ */
@@ -1829,6 +2267,16 @@ input:focus-visible {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+.card-badge-sale {
+  background: #db2c2c;
+}
+
+@media (max-width: 992px) {
+  .card-badge {
+    display: none;
+  }
+}
+
 .cart-line-img {
   background: #fff;
   border-radius: 12px;
@@ -1962,10 +2410,9 @@ input:focus-visible {
 }
 
 .pdp-main-img {
-  background: #fff;
+  background: transparent;
   border-radius: 24px;
   padding: 44px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
 .pdp-main-img img {
@@ -1982,12 +2429,12 @@ input:focus-visible {
 
 .pdp-thumb {
   width: 74px;
-  background: #fff;
+  background: transparent;
   border: 2px solid transparent;
   border-radius: 12px;
   padding: 8px;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  box-shadow: none; /* Removed shadow since background is transparent */
 }
 
 .pdp-thumb.is-active {
@@ -2041,6 +2488,27 @@ input:focus-visible {
 .pdp-model {
   max-width: 400px;
   margin-bottom: 24px;
+}
+
+/* Prompt shown until a phone model is chosen (Add/Buy are disabled meanwhile) */
+.pdp-model-hint {
+  max-width: 400px;
+  margin: -12px 0 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9a5a2a;
+}
+
+.pdp-add:disabled,
+.pdp-buy:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pdp-buy:disabled:hover {
+  background: #fff;
+  color: #2540ad;
 }
 
 .pdp-actions {
@@ -2552,8 +3020,8 @@ input:focus-visible {
 
   .nav-bar {
     padding: 8px 0;
-    background: #fbf3dc;
-    /* solid cream to unify with hero (matches loader bg) */
+    background: #fff9d6;
+    /* solid hero cream to unify with hero (matches loader bg) */
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }

@@ -12,9 +12,9 @@ export default function Footer() {
         </div>
         <div>
           <h3>Shop</h3>
-          <Link href="/#collection">All Cases</Link>
-          <Link href="/#new-arrivals">New Arrivals</Link>
-          <Link href="/#on-sale">On Sale</Link>
+          <Link href="/shop">All Cases</Link>
+          <Link href="/shop?filter=new-arrivals">New Arrivals</Link>
+          <Link href="/shop?filter=sale">On Sale</Link>
         </div>
         <div>
           <h3>Help</h3>

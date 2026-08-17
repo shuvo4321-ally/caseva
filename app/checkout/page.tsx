@@ -35,7 +35,7 @@ export default function CheckoutPage() {
           <div className="confirm-check" aria-hidden="true">✓</div>
           <h1 className="checkout-title">Order placed!</h1>
           <p>Thanks, {form.name.split(" ")[0] || "friend"} — we&rsquo;ve got your order and will text you on {form.phone} with delivery details.</p>
-          <Link className="cta" href="/#collection">Continue shopping</Link>
+          <Link className="cta" href="/shop">Continue shopping</Link>
         </div>
       </main>
     );
@@ -46,7 +46,7 @@ export default function CheckoutPage() {
       <main id="main" tabIndex={-1} className="checkout-page">
         <div className="container checkout-empty">
           <h1 className="checkout-title">Your cart is empty</h1>
-          <Link className="cta" href="/#collection">Shop the Collection</Link>
+          <Link className="cta" href="/shop">Shop the Collection</Link>
         </div>
       </main>
     );

@@ -37,7 +37,7 @@ export const viewport = {
   initialScale: 1,
   /* No maximumScale / userScalable lock — pinch-zoom must stay available
      (WCAG 1.4.4; shoppers zoom product photos). */
-  themeColor: "#fbf3dc",
+  themeColor: "#fff9d6",
 };
 
 export default function RootLayout({

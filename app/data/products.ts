@@ -85,21 +85,51 @@ export const PRODUCTS: Product[] = [
 ];
 
 // ----- Device compatibility (shared by hero + PDP model selectors) -----
-export const PHONE_MODELS = [
-  "iPhone 16 Pro Max",
-  "iPhone 16 Pro",
-  "iPhone 16 Plus",
-  "iPhone 16",
-  "iPhone 15 Pro Max",
-  "iPhone 15 Pro",
-  "iPhone 15 Plus",
-  "iPhone 15",
-  "iPhone 14 Pro Max",
-  "iPhone 14 Pro",
-  "iPhone 14",
-  "iPhone 13 Pro",
-  "iPhone 13",
+// Grouped by brand: the selector shows brands first, then the chosen brand's
+// models. Add a brand or model by editing this list only.
+export type PhoneBrand = { brand: string; models: string[] };
+export const PHONE_BRANDS: PhoneBrand[] = [
+  {
+    brand: "iPhone",
+    models: [
+      "iPhone 16 Pro Max",
+      "iPhone 16 Pro",
+      "iPhone 16 Plus",
+      "iPhone 16",
+      "iPhone 15 Pro Max",
+      "iPhone 15 Pro",
+      "iPhone 15 Plus",
+      "iPhone 15",
+      "iPhone 14 Pro Max",
+      "iPhone 14 Pro",
+      "iPhone 14",
+      "iPhone 13 Pro",
+      "iPhone 13",
+    ],
+  },
+  {
+    brand: "Pixel",
+    models: [
+      "Pixel 9 Pro XL",
+      "Pixel 9 Pro",
+      "Pixel 9",
+      "Pixel 8 Pro",
+      "Pixel 8",
+      "Pixel 8a",
+      "Pixel 7 Pro",
+      "Pixel 7",
+      "Pixel 7a",
+    ],
+  },
 ];
+
+// Flat list of every supported model — used to validate a saved selection.
+export const PHONE_MODELS: string[] = PHONE_BRANDS.flatMap((b) => b.models);
+
+// The brand a model belongs to (falls back to the first brand).
+export const brandOfModel = (model: string): string =>
+  PHONE_BRANDS.find((b) => b.models.includes(model))?.brand ?? PHONE_BRANDS[0].brand;
+
 export const DEFAULT_MODEL = "iPhone 16 Pro";
 export const MODEL_STORAGE_KEY = "caseva-iphone-model";
 

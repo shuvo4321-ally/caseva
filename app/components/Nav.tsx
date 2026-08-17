@@ -76,7 +76,7 @@ export default function Nav() {
         </div>
       </div>
       <div id="nav-menu" className={`nav-menu ${menuOpen ? "is-open" : ""}`}>
-        <Link className="nav-menu-link" href="/#collection" onClick={() => setMenuOpen(false)}>Shop</Link>
+        <Link className="nav-menu-link" href="/shop" onClick={() => setMenuOpen(false)}>Shop</Link>
         <Link className="nav-menu-link" href="/#compare" onClick={() => setMenuOpen(false)}>Why CASEVA</Link>
         <Link className="nav-menu-link" href="/#subscribe" onClick={() => setMenuOpen(false)}>Subscribe</Link>
         {/* Cart lives here on mobile (icon hidden from the bar to de-clutter) */}

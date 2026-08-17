@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -9,10 +10,10 @@ import { CustomEase } from "gsap/CustomEase";
 import {
   PRODUCTS,
   PHONE_MODELS,
-  DEFAULT_MODEL,
   MODEL_STORAGE_KEY,
 } from "./data/products";
 import CollectionShowcase from "./components/CollectionShowcase";
+import ModelSelector from "./components/ModelSelector";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
 
@@ -112,10 +113,7 @@ function CounterDigits() {
 
 export default function Home() {
   const root = useRef<HTMLDivElement>(null);
-  const [selectedModel, setSelectedModel] = useState<string>(DEFAULT_MODEL);
-  const [modelOpen, setModelOpen] = useState(false);
-  const modelMenuRef = useRef<HTMLDivElement>(null);
-  const modelTriggerRef = useRef<HTMLButtonElement>(null);
+  const [selectedModel, setSelectedModel] = useState<string>(""); // unselected → "Select your phone" until the shopper picks brand + model
 
   // Hydrate from localStorage after mount (avoids SSR mismatch)
   useEffect(() => {
@@ -127,56 +125,8 @@ export default function Home() {
     }
   }, []);
 
-  // Close dropdown on outside click + Escape (Escape returns focus to the
-  // trigger so keyboard users aren't dropped at the document root)
-  useEffect(() => {
-    if (!modelOpen) return;
-    const onDown = (e: MouseEvent) => {
-      if (modelMenuRef.current && !modelMenuRef.current.contains(e.target as Node)) {
-        setModelOpen(false);
-      }
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setModelOpen(false);
-        modelTriggerRef.current?.focus();
-      }
-    };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [modelOpen]);
-
-  // Listbox keyboard support: focus lands on the selected option when the
-  // menu opens; ArrowUp/Down move through options (looping), Home/End jump.
-  useEffect(() => {
-    if (!modelOpen) return;
-    const options = Array.from(
-      modelMenuRef.current?.querySelectorAll<HTMLButtonElement>(".model-option") ?? []
-    );
-    if (!options.length) return;
-    (options.find((o) => o.classList.contains("is-selected")) ?? options[0]).focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) return;
-      e.preventDefault();
-      const idx = options.indexOf(document.activeElement as HTMLButtonElement);
-      const next =
-        e.key === "Home" ? 0 :
-          e.key === "End" ? options.length - 1 :
-            e.key === "ArrowDown" ? (idx + 1) % options.length :
-              (idx - 1 + options.length) % options.length;
-      options[next].focus();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [modelOpen]);
-
   const handleModelSelect = (model: string) => {
     setSelectedModel(model);
-    setModelOpen(false);
     try {
       window.localStorage.setItem(MODEL_STORAGE_KEY, model);
     } catch {
@@ -999,14 +949,17 @@ export default function Home() {
         // scrolling down killed the previous tween and scrolling back UP had
         // nothing left to reverse — the colour snapped instead of easing. A pure
         // interpolation of scroll position is identical (and smooth) both ways.
-        const CREAM = "#fbf3dc";
+        const HERO_CREAM = "#fff9d6"; // the page opens on this (hero)
+        const CREAM = "#fbf3dc";      // site cream used further down the page
         const wash: Array<{ sel: string; color: string; at?: number }> = [
           { sel: ".value-prop", color: "#b2cdff" },      // blue
           { sel: ".cheers", color: "#fce5e5" },          // soft pink
-          { sel: ".collection-wrap", color: CREAM },     // cream
-          // "CASEVA Standard" carousel keeps its CASETiFY grey; a higher `at`
-          // greys the body a little later so the cream bento tiles above are
-          // mostly scrolled off before it engages.
+          // The feature carousel opens .collection-wrap and is transparent, so
+          // this wash colour IS its background — a soft periwinkle band.
+          { sel: ".collection-wrap", color: "#cfdcfb" }, // soft periwinkle
+          // Product carousel keeps its CASETiFY grey; a higher `at` greys the
+          // body a little later so the feature band is mostly scrolled off
+          // before it engages.
           { sel: ".product-row", color: "#e5e5e5", at: 0.25 }, // CASETiFY grey
           { sel: ".comparison", color: "#cbe8ce" },      // light sage
           { sel: ".testimonial", color: CREAM },         // cream
@@ -1030,8 +983,8 @@ export default function Home() {
             })
             .filter((s): s is { y: number; color: string } => s !== null)
             .sort((a, b) => a.y - b.y);
-          // open on cream at the very top of the page
-          if (!stops.length || stops[0].y > 0) stops.unshift({ y: 0, color: CREAM });
+          // open on the hero cream at the very top of the page
+          if (!stops.length || stops[0].y > 0) stops.unshift({ y: 0, color: HERO_CREAM });
         };
         const colorAt = (y: number): string => {
           if (y <= stops[0].y) return stops[0].color;
@@ -1206,58 +1159,15 @@ export default function Home() {
               Phone cases pretty enough<br className="desktop-br" />{" "}to keep on.
             </h1>
 
-            <div className="model-selector" ref={modelMenuRef}>
-              <button
-                type="button"
-                ref={modelTriggerRef}
-                className="model-trigger"
-                aria-haspopup="listbox"
-                aria-expanded={modelOpen}
-                aria-label={`Shop for ${selectedModel}. Click to change phone model.`}
-                onClick={() => setModelOpen((v) => !v)}
-              >
-                <svg className="model-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <rect x="6" y="2" width="12" height="20" rx="2" />
-                  <line x1="11" y1="18" x2="13" y2="18" />
-                </svg>
-                <span className="model-label">
-                  <span className="model-prefix">Shop for</span>
-                  <span className="model-value">{selectedModel}</span>
-                </span>
-                <svg className={`model-chevron ${modelOpen ? "is-open" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
-
-              {modelOpen && (
-                <ul className="model-menu" role="listbox" aria-label="iPhone models">
-                  {PHONE_MODELS.map((m) => (
-                    <li key={m} role="option" aria-selected={m === selectedModel}>
-                      <button
-                        type="button"
-                        className={`model-option ${m === selectedModel ? "is-selected" : ""}`}
-                        onClick={() => handleModelSelect(m)}
-                      >
-                        {m}
-                        {m === selectedModel && (
-                          <svg className="model-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <path d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <ModelSelector value={selectedModel} onChange={handleModelSelect} />
 
             <div className="cta-wrap left-align">
-              <a className="cta" href="#collection">
+              <Link className="cta" href="/shop">
                 Shop the Collection
                 <svg className="cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
-              </a>
+              </Link>
             </div>
 
           </div>
@@ -1285,8 +1195,6 @@ export default function Home() {
         <section className="value-prop">
           <Image className="vp-corner vp-bl" src="/pink-floral-case-v2.png" alt="" width={260} height={400} />
           <Image className="vp-corner vp-br" src="/rose-case-v2.png" alt="" width={260} height={400} />
-          <svg className="vp-dot vp-dot-1" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" /></svg>
-          <svg className="vp-dot vp-dot-2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" /></svg>
           <div className="container vp-inner">
             <p className="vp-text reveal">
               Our <span className="vp-highlight">stylish</span> and{" "}
