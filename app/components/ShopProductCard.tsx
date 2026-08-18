@@ -54,7 +54,7 @@ export default function ShopProductCard({ product, device }: { product: Product;
       <div className="shopcard-body">
         <Link className="shopcard-name" href={`/product/${product.slug}`}>{product.name}</Link>
         <p className="shopcard-device">{device}</p>
-        <p className="shopcard-type">Impact Case MagSafe Compatible</p>
+        <p className="shopcard-type">{product.caseType}</p>
         <p className="shopcard-price">
           {product.salePrice ? (
             <>

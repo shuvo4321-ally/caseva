@@ -10,11 +10,13 @@ export default function ModelSelector({
   onChange,
   className = "",
   prefix = "Shop for",
+  placeholder = "Select your phone",
 }: {
   value: string;
   onChange: (model: string) => void;
   className?: string;
   prefix?: string;
+  placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -79,7 +81,7 @@ export default function ModelSelector({
         className="model-trigger"
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={value ? `${prefix} ${value}. Click to change phone model.` : "Select your phone model"}
+        aria-label={value ? `${prefix} ${value}. Click to change phone model.` : placeholder}
         onClick={toggle}
       >
         <svg className="model-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -89,7 +91,7 @@ export default function ModelSelector({
         <span className="model-label">
           <span className="model-prefix">{prefix}</span>
           <span className={`model-value ${value ? "" : "is-placeholder"}`.trim()}>
-            {value || "Select your phone"}
+            {value || placeholder}
           </span>
         </span>
         <svg className={`model-chevron ${open ? "is-open" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

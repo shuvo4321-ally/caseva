@@ -12,7 +12,7 @@ export default function CollectionShowcase() {
       <ProductRow
         id="all-products"
         title="Bestselling Prints"
-        subtitle="Our most-loved designs — impact-tested and MagSafe-ready."
+        viewAllHref="/shop"
         products={allProductsSorted()}
       />
     </section>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import ProductCard from "./ProductCard";
 import { type Product } from "../data/products";
@@ -9,12 +10,13 @@ import { type Product } from "../data/products";
 export default function ProductRow({
   id,
   title,
-  subtitle,
+  viewAllHref,
   products,
 }: {
   id: string;
   title: string;
-  subtitle?: string;
+  /** Renders a "View all" link opposite the title, as on the home row. */
+  viewAllHref?: string;
   products: Product[];
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -47,10 +49,15 @@ export default function ProductRow({
   return (
     <section id={id} className={`product-row product-row-${id}`} aria-label={title}>
       <div className="container product-row-head">
-        <div className="product-row-title-wrap">
-          <h2 className="product-row-title reveal">{title}</h2>
-          {subtitle && <p className="product-row-subtitle reveal">{subtitle}</p>}
-        </div>
+        <h2 className="product-row-title reveal">{title}</h2>
+        {viewAllHref && (
+          <Link className="product-row-viewall reveal" href={viewAllHref}>
+            View all
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </Link>
+        )}
       </div>
       <div className="product-row-track" ref={trackRef} onScroll={handleScroll}>
         {products.map((p) => (

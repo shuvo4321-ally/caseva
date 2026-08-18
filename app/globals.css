@@ -1031,7 +1031,7 @@ input:focus-visible {
    catalog grows (unlike a fixed-width pinned track). */
 .collection-wrap {
   background: transparent;
-  padding: 120px 0;
+  padding: 20px 0 48px;
   position: relative;
 }
 
@@ -1045,83 +1045,66 @@ input:focus-visible {
 }
 
 /* ============ HOME FEATURE BANNER ============ */
-/* Full-bleed promo band: one photo filling the band with the copy overlaid
-   (see FeatureBanner.tsx for how to swap the photo). */
+/* A lifestyle backdrop with a case standing in the centre. The scene SNAPS to
+   the next one (no cross-fade) and carries no text — the copy sits below it. */
 .feature-banner {
-  position: relative;
-  min-height: 620px;
-  display: flex;
-  align-items: flex-end;
-  padding: 0 0 68px 6%;
-  margin-bottom: 70px;
-  overflow: hidden;
+  margin-bottom: 40px;
 }
 
-/* The banner photo — fills the band, cropped to whatever shape it is.
-   The bottom is masked to transparent so the band dissolves into the page
-   colour below instead of ending on a hard horizontal edge. */
+.feature-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #efece4;
+}
+
+/* Backdrops stack; only the active one is shown. No transition = sudden cut. */
 .feature-img {
   object-fit: cover;
   object-position: center;
+  opacity: 0;
   z-index: 0;
-  -webkit-mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0) 100%);
-  mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0) 100%);
 }
 
-/* LIGHT scrim — a soft light veil, not a dark one. A dark overlay turned the
-   band into a heavy grey block that clashed with the cream/pastel page; this
-   keeps the photo bright and blended while still lifting the dark copy off it. */
-.feature-banner::after {
-  content: "";
+.feature-img.is-active { opacity: 1; }
+
+/* The case stands centred on top of the backdrop, slightly overlapping it. */
+.feature-case {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 34%;
+  height: auto;
   z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(
-    100deg,
-    rgba(255, 252, 242, 0.88) 0%,
-    rgba(255, 252, 242, 0.6) 34%,
-    rgba(255, 252, 242, 0.14) 62%,
-    rgba(255, 252, 242, 0) 100%
-  );
-  /* fade the veil out at the bottom too, or it leaves its own cream edge */
-  -webkit-mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0) 100%);
-  mask-image: linear-gradient(to bottom, #000 58%, rgba(0, 0, 0, 0) 100%);
+  opacity: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 22px 30px rgba(0, 0, 0, 0.34));
 }
 
+.feature-case.is-active { opacity: 1; }
+
+/* ---- Copy, below the image ---- */
 .feature-copy {
-  position: relative;
-  z-index: 2;
-  max-width: 560px;
-  color: #111;
-}
-
-.feature-eyebrow {
-  display: block;
-  font-size: 15px;
-  font-weight: 700;
-  font-style: italic;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: #2540ad;
-  margin-bottom: 10px;
+  padding: 26px 24px 0;
+  max-width: 640px;
 }
 
 .feature-title {
   font-family: var(--font-fraunces), Georgia, serif;
   font-weight: 900;
-  font-size: clamp(34px, 4.4vw, 58px);
-  line-height: 1.06;
-  margin: 0 0 16px;
+  font-size: clamp(30px, 5vw, 46px);
+  line-height: 1.08;
+  margin: 0 0 12px;
   color: #111;
 }
 
 .feature-desc {
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.6;
   color: #444;
-  max-width: 500px;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
 }
 
 .feature-cta {
@@ -1131,8 +1114,8 @@ input:focus-visible {
   color: #fff;
   font-family: inherit;
   font-weight: 600;
-  font-size: 17px;
-  padding: 15px 40px;
+  font-size: 16px;
+  padding: 14px 38px;
   border-radius: 50px;
   text-decoration: none;
   transition: background 0.2s ease, transform 0.15s ease;
@@ -1140,40 +1123,10 @@ input:focus-visible {
 
 .feature-cta:hover { background: #2540ad; transform: translateY(-2px); }
 
-/* ---- Mobile: taller frame, copy overlaid across the bottom ---- */
-@media (max-width: 900px) {
-  .feature-banner {
-    min-height: 0;
-    aspect-ratio: 9 / 13;
-    padding: 0 24px 48px;
-    margin-bottom: 50px;
-  }
-
-  /* Light veil peaks over the mid band (where copy starts on top of the photo)
-     and clears at both ends, so the masked bottom can dissolve cleanly into
-     the page colour. */
-  .feature-banner::after {
-    background: linear-gradient(
-      to top,
-      rgba(255, 252, 242, 0.72) 0%,
-      rgba(255, 252, 242, 0.78) 30%,
-      rgba(255, 252, 242, 0.3) 62%,
-      rgba(255, 252, 242, 0) 100%
-    );
-  }
-
-  /* photo fades out earlier on mobile — the copy occupies the lower half */
-  .feature-img,
-  .feature-banner::after {
-    -webkit-mask-image: linear-gradient(to bottom, #000 52%, rgba(0, 0, 0, 0) 96%);
-    mask-image: linear-gradient(to bottom, #000 52%, rgba(0, 0, 0, 0) 96%);
-  }
-
-  .feature-copy { max-width: none; }
-  .feature-eyebrow { font-size: 14px; }
-  .feature-title { font-size: clamp(30px, 8.2vw, 42px); }
-  .feature-desc { font-size: 16px; margin-bottom: 22px; }
-  .feature-cta { font-size: 16px; padding: 14px 36px; }
+@media (min-width: 760px) {
+  .feature-stage { aspect-ratio: 16 / 10; }
+  .feature-case { width: 20%; }
+  .feature-copy { padding: 32px 40px 0; }
 }
 
 /* ============ COLLECTION SHOWCASE (big carousel + filter tabs) ============ */
@@ -1360,19 +1313,10 @@ input:focus-visible {
 }
 
 .casetify-style {
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  background: transparent;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   height: 100%;
-}
-
-.casetify-style:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
 
 /* Card link wrapper */
@@ -1388,7 +1332,7 @@ input:focus-visible {
 .casetify-img-bg {
   position: relative;
   background: transparent;
-  padding: 30px;
+  padding: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1429,28 +1373,39 @@ input:focus-visible {
 }
 
 .casetify-card-body {
-  padding: 24px;
+  padding: 14px 6px 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
   flex-grow: 1;
 }
 
 .casetify-title {
-  font-family: var(--font-fraunces), serif;
-  font-size: 20px;
-  font-weight: 800;
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
   color: #111;
-  margin-bottom: 6px;
 }
 
 .casetify-subtitle {
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  justify-content: center;
   gap: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 12px;
+  /* matches .shopcard-price on /shop so a price looks the same site-wide */
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #2540ad;
+}
+
+.casetify-subtitle .price-was {
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .price-was {
@@ -1461,39 +1416,6 @@ input:focus-visible {
 
 .price-now {
   color: #2540ad;
-}
-
-.casetify-desc {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.5;
-  margin-bottom: 24px;
-  flex-grow: 1;
-}
-
-.casetify-shop-btn {
-  background: #fff;
-  border: 1px solid #111;
-  color: #111;
-  border-radius: 50px;
-  padding: 10px 24px;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  align-self: flex-start;
-  transition: all 0.2s;
-}
-
-.casetify-shop-btn:hover {
-  background: #111;
-  color: #fff;
-}
-
-.casetify-shop-btn.is-added {
-  background: #2540ad;
-  border-color: #2540ad;
-  color: #fff;
 }
 
 /* ============ SHOP PAGE (/shop — catalog, CASEVA DNA) ============ */
@@ -1605,43 +1527,235 @@ input:focus-visible {
 
 .sort-icon { width: 18px; height: 18px; }
 
-.shop-dd-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  min-width: 224px;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 14px;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
-  padding: 6px;
-  z-index: 20;
+/* ---- Filter & Sort sheet (mobile-style panel, used at every width) ---- */
+.shop-active-summary {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2540ad;
 }
 
-.shop-dd--right .shop-dd-menu { left: auto; right: 0; }
+.fs-overlay {
+  position: fixed;
+  inset: 0;
+  /* dvh tracks the *visual* viewport — with plain inset:0 the cream page
+     showed as a strip under the sheet while mobile browser UI collapsed */
+  height: 100dvh;
+  z-index: 120;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(20, 18, 30, 0.42);
+  animation: fs-fade 0.18s ease-out;
+  overscroll-behavior: contain;
+  touch-action: none;
+}
 
-.shop-dd-item {
+.fs-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: #f4f2ec;
+  border-radius: 22px 22px 0 0;
+  padding: 10px 0 0;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.18);
+  animation: fs-rise 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+  outline: none;
+}
+
+/* drag-handle affordance */
+.fs-grabber {
+  width: 44px;
+  height: 4px;
+  margin: 0 auto 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.fs-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px 14px;
+}
+
+.fs-title {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 19px;
+  font-weight: 800;
+  color: #111;
+}
+
+.fs-close {
+  position: absolute;
+  right: 20px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.fs-body {
+  overflow-y: auto;
+  padding: 0 20px 8px;
+  -webkit-overflow-scrolling: touch;
+  /* scrolling the list must not chain out and drag the page behind it */
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+.fs-section { padding: 14px 0 18px; }
+.fs-section + .fs-section { border-top: 1px solid rgba(0, 0, 0, 0.08); }
+
+.fs-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 14px;
+}
+
+.fs-label svg { width: 18px; height: 18px; }
+
+/* Collapsible section header — used by Sort By */
+.fs-collapse {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 11px 14px;
+  padding: 0;
   border: none;
   background: none;
-  border-radius: 9px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.fs-collapse .fs-label { margin-bottom: 0; }
+
+.fs-chev {
+  width: 20px;
+  height: 20px;
+  color: #6a6a5a;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.fs-chev.is-open { transform: rotate(180deg); }
+
+/* the pills sit below an expanded header */
+.fs-collapse + .fs-pills { margin-top: 14px; }
+
+.fs-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fs-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 22px;
+  border-radius: 50px;
+  border: 1.5px solid #d8d4c5;
+  background: #fff;
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
   color: #111;
   cursor: pointer;
-  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.shop-dd-item:hover { background: #f5f3ec; }
-.shop-dd-item.is-active { background: rgba(37, 64, 173, 0.08); color: #2540ad; font-weight: 700; }
-.shop-dd-count { font-size: 12px; font-weight: 700; color: #8a8778; }
-.shop-dd-item.is-active .shop-dd-count { color: #2540ad; }
+.fs-pill:hover { border-color: #b8b3a3; }
+
+.fs-pill.is-active {
+  background: #2540ad;
+  border-color: #2540ad;
+  color: #fff;
+  font-weight: 700;
+}
+
+.fs-pill-count { font-size: 12px; font-weight: 700; opacity: 0.55; }
+.fs-pill.is-active .fs-pill-count { opacity: 0.85; }
+
+/* Skirt: paints sheet-coloured area below the sheet so no page cream can show
+   in the gap Chrome Android leaves when its URL bar collapses (dvh alone
+   doesn't reliably cover it). Mobile only — the desktop sheet is centred. */
+.fs-sheet::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 160px;
+  background: #f4f2ec;
+  pointer-events: none;
+}
+
+.fs-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px calc(18px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f4f2ec;
+}
+
+.fs-reset {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #6a6a5a;
+  cursor: pointer;
+  padding: 12px 4px;
+}
+
+.fs-reset:hover { color: #111; }
+
+.fs-apply {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  border-radius: 50px;
+  background: #2540ad;
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.fs-apply:hover { background: #1c3580; }
+
+@keyframes fs-rise { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes fs-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Centre the panel on larger screens rather than gluing it to the bottom */
+@media (min-width: 760px) {
+  .fs-overlay { align-items: center; }
+  .fs-sheet { border-radius: 22px; max-height: 78vh; }
+  .fs-sheet::after { display: none; }
+  .fs-foot { padding-bottom: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-sheet, .fs-overlay { animation: none; }
+}
 
 .shop-count {
   font-size: 14px;
@@ -1793,7 +1907,7 @@ input:focus-visible {
 /* padding trimmed vs. a standalone row — these stack inside .collection-wrap.
    scroll-margin-top so tile jumps land the heading below the sticky nav. */
 .product-row {
-  padding: 60px 0;
+  padding: 34px 0 28px;
   position: relative;
   scroll-margin-top: 96px;
   /* Transparent — the CASETiFY-grey is applied to the page body by the
@@ -1804,30 +1918,42 @@ input:focus-visible {
 
 .product-row-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 34px;
-}
-
-.product-row-title-wrap {
-  display: flex;
-  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 26px;
 }
 
 .product-row-title {
   font-family: var(--font-fraunces), serif;
   font-weight: 900;
-  font-size: 40px;
+  /* sized to stay on ONE line next to the View all link, even on a phone */
+  font-size: clamp(21px, 5.2vw, 40px);
+  line-height: 1.1;
   color: #111;
-  margin-bottom: 8px;
 }
 
-.product-row-subtitle {
-  font-size: 16px;
-  color: #333;
-  max-width: 600px;
-  line-height: 1.5;
+.product-row-viewall {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #111;
+  text-decoration: none;
+  white-space: nowrap;
 }
+
+.product-row-viewall svg {
+  width: 17px;
+  height: 17px;
+  transition: transform 0.2s ease;
+}
+
+.product-row-viewall:hover svg { transform: translateX(4px); }
 
 .product-row-nav {
   display: none; /* Replaced by the new footer nav */
@@ -1862,7 +1988,7 @@ input:focus-visible {
 
 .product-row-track {
   display: flex;
-  gap: 30px;
+  gap: 22px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
@@ -1876,16 +2002,16 @@ input:focus-visible {
 }
 
 .product-row-card {
-  flex: 0 0 400px; /* Widened for CASETiFY card styling */
+  flex: 0 0 240px;
   scroll-snap-align: start;
-  height: auto; /* Allow track to stretch this */
+  height: auto;
 }
 
 .product-row-footer {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 40px;
+  margin-top: 22px;
   position: relative;
 }
 
@@ -2872,9 +2998,6 @@ input:focus-visible {
     order: -1;
   }
 
-  .product-row-title {
-    font-size: 34px;
-  }
 
   .product-row {
     padding: 60px 0;
@@ -3169,7 +3292,7 @@ input:focus-visible {
      gutter. Adding it on the section too double-gutters to 48px/side and
      squeezed the cards to 122px. */
   .collection-wrap {
-    padding: 70px 0;
+    padding: 40px 0;
   }
 
   /* Base rule's min-height:90vh + flex-center gives a very tall section on a
@@ -3214,7 +3337,7 @@ input:focus-visible {
   }
 
   .collection-wrap {
-    padding: 20px 0 80px; /* Substantially reduced top gap for mobile */
+    padding: 16px 0 40px;
   }
 
   .collection-title {
@@ -3306,9 +3429,10 @@ input:focus-visible {
     font-size: 16px;
   }
 
-  .product-row-card {
-    flex: 0 0 340px; /* Wider card size on mobile */
-  }
+  /* ~2 cards plus a peek of the next, so the row reads as a carousel.
+     Tighter gutter/gap here than desktop so two actually fit on a phone. */
+  .product-row-track { padding: 8px 24px 20px; gap: 16px; }
+  .product-row-card { flex: 0 0 46%; }
 
   .collection-price {
     font-size: 16px;
@@ -3322,4 +3446,271 @@ input:focus-visible {
   .footer-grid {
     grid-template-columns: 1fr;
   }
+}
+/* Model list can run long (13 iPhones) — cap it and scroll inside the sheet */
+.fs-pills--scroll {
+  max-height: 188px;
+  overflow-y: auto;
+  padding-right: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fs-note {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #8a8778;
+}
+
+/* Count of active filters, on the Filter button */
+.banner-btn-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 2px;
+  border-radius: 50px;
+  background: #fff;
+  color: #2540ad;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ============ SEARCH OVERLAY ============ */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  z-index: 140;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: rgba(20, 18, 30, 0.42);
+  overscroll-behavior: contain;
+  animation: fs-fade 0.16s ease-out;
+}
+
+.search-panel {
+  width: 100%;
+  max-width: 640px;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #fff9d6;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.search-bar-icon { width: 20px; height: 20px; color: #2540ad; flex-shrink: 0; }
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 16px; /* 16px avoids iOS zoom-on-focus */
+  color: #111;
+  outline: none;
+}
+
+.search-input::placeholder { color: #9a9484; }
+.search-input::-webkit-search-cancel-button { display: none; }
+
+.search-clear {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.08);
+  color: #444;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.search-clear svg { width: 13px; height: 13px; }
+
+.search-cancel {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2540ad;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 4px;
+}
+
+.search-results {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 10px 18px;
+}
+
+.search-hint {
+  padding: 22px 12px;
+  font-size: 14px;
+  color: #6b6b6b;
+  text-align: center;
+}
+
+.search-hint a { color: #2540ad; font-weight: 600; }
+
+.search-count {
+  padding: 8px 12px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #8a8778;
+}
+
+.search-list { list-style: none; margin: 0; padding: 0; }
+
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.search-row:hover { background: rgba(0, 0, 0, 0.05); }
+
+.search-thumb {
+  flex-shrink: 0;
+  width: 46px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.search-thumb img { width: 100%; height: 100%; object-fit: contain; }
+
+.search-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.search-name { font-size: 15px; font-weight: 700; color: #111; }
+.search-type { font-size: 13px; color: #6b6b6b; }
+
+.search-price {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #2540ad;
+}
+
+.search-price .price-was { font-size: 13px; font-weight: 500; }
+
+@media (max-width: 640px) {
+  .search-panel { max-width: none; border-radius: 0; height: 100dvh; }
+}
+
+/* ---- Price range (two thumbs sharing one track) ---- */
+.fs-range { padding-top: 2px; }
+
+.fs-range-value {
+  display: block;
+  font-size: 17px;
+  font-weight: 800;
+  color: #2540ad;
+  margin-bottom: 14px;
+}
+
+.fs-range-track {
+  position: relative;
+  height: 26px;
+}
+
+/* the rail */
+.fs-range-track::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  transform: translateY(-50%);
+  border-radius: 4px;
+  background: #d8d4c5;
+}
+
+/* selected span between the thumbs */
+.fs-range-fill {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  transform: translateY(-50%);
+  border-radius: 4px;
+  background: #2540ad;
+}
+
+/* Both inputs stack on the same track. pointer-events is disabled on the bar
+   and re-enabled on the thumbs, so whichever thumb you touch is the one that
+   moves — otherwise the top input would swallow every drag. */
+.fs-range-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 26px;
+  margin: 0;
+  background: none;
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: none;
+}
+
+.fs-range-input:focus { outline: none; }
+
+.fs-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #2540ad;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  cursor: grab;
+}
+
+.fs-range-input::-moz-range-thumb {
+  pointer-events: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #2540ad;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  cursor: grab;
+}
+
+.fs-range-input:focus-visible::-webkit-slider-thumb { outline: 3px solid #2540ad; outline-offset: 2px; }
+
+.fs-range-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #8a8778;
 }

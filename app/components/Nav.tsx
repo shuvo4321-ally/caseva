@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "../cart-context";
+import SearchOverlay from "./SearchOverlay";
 
 // Shared sticky header used on every route. Section links point at the home
 // page anchors ("/#collection") so they work from product/checkout routes too.
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const { count, openDrawer } = useCart();
 
@@ -40,7 +42,13 @@ export default function Nav() {
           CASEVA
         </Link>
         <div className="nav-right">
-          <button className="icon-btn" aria-label="Search">
+          <button
+            className="icon-btn"
+            aria-label="Search"
+            aria-haspopup="dialog"
+            aria-expanded={searchOpen}
+            onClick={() => { setMenuOpen(false); setSearchOpen(true); }}
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.35-4.35" />
@@ -85,6 +93,8 @@ export default function Nav() {
           {count > 0 && <span className="nav-menu-cart-count">{count}</span>}
         </button>
       </div>
+
+      {searchOpen && <SearchOverlay onClose={() => setSearchOpen(false)} />}
     </nav>
   );
 }

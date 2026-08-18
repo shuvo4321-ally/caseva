@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
 import {
   PRODUCTS,
-  PHONE_MODELS,
   MODEL_STORAGE_KEY,
 } from "./data/products";
 import CollectionShowcase from "./components/CollectionShowcase";
@@ -113,17 +113,8 @@ function CounterDigits() {
 
 export default function Home() {
   const root = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   const [selectedModel, setSelectedModel] = useState<string>(""); // unselected → "Select your phone" until the shopper picks brand + model
-
-  // Hydrate from localStorage after mount (avoids SSR mismatch)
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(MODEL_STORAGE_KEY);
-      if (saved && PHONE_MODELS.includes(saved)) setSelectedModel(saved);
-    } catch {
-      /* localStorage unavailable */
-    }
-  }, []);
 
   const handleModelSelect = (model: string) => {
     setSelectedModel(model);
@@ -132,9 +123,9 @@ export default function Home() {
     } catch {
       /* ignore */
     }
-    // No explicit behavior — html { scroll-behavior: smooth } drives it, and
-    // the reduced-motion media override switches it to an instant jump.
-    document.querySelector("#collection")?.scrollIntoView({ block: "start" });
+    // Picking a phone is a shopping intent — send them straight to the shop
+    // (it reads the same storage key, so the device carries over).
+    router.push("/shop");
   };
 
   // The scroll colour-wash paints document.body's background inline. Clear it
@@ -961,7 +952,7 @@ export default function Home() {
           // Product carousel keeps its CASETiFY grey; a higher `at` greys the
           // body a little later so the feature band is mostly scrolled off
           // before it engages.
-          { sel: ".product-row", color: "#e5e5e5", at: 0.25 }, // CASETiFY grey
+          { sel: ".product-row", color: "#ffffff", at: 0.25 }, // bright product stage
           { sel: ".comparison", color: "#cbe8ce" },      // light sage
           { sel: ".testimonial", color: CREAM },         // cream
           { sel: ".subscribe", color: "#e2dbf7" },       // light lavender
@@ -1169,7 +1160,11 @@ export default function Home() {
               Phone cases pretty enough<br className="desktop-br" />{" "}to keep on.
             </h1>
 
-            <ModelSelector value={selectedModel} onChange={handleModelSelect} />
+            <ModelSelector
+              value={selectedModel}
+              onChange={handleModelSelect}
+              placeholder="iPhone & Pixel Cases"
+            />
 
             <div className="cta-wrap left-align">
               <Link className="cta" href="/shop">
