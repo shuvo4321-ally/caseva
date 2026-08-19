@@ -4,17 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-// Feature stage: a lifestyle backdrop with a case standing in the middle of it.
-// The whole scene (backdrop + case) SNAPS to the next one on a timer — no
-// cross-fade — and carries no text; the copy sits underneath on the page.
+// Feature stage: lifestyle photography that SNAPS to the next shot on a timer
+// — no cross-fade — carrying no text; the copy sits underneath on the page.
 //
-// TO EDIT: pair a backdrop with the case that should stand on it. Backdrops
-// live in /public as feature-banner*.jpg.
-const SCENES = [
-  { backdrop: "/feature-banner.jpg", case: "/pink-bow-hero.png" },
-  { backdrop: "/feature-banner-2.jpg", case: "/blue-case-hero.png" },
-  { backdrop: "/feature-banner-3.jpg", case: "/tulip-hero.png" },
-];
+// No case is composited on top: these photographs already contain a case, so
+// overlaying another produced two overlapping phones. Compositing only makes
+// sense over case-free lifestyle collages.
+const SCENES = ["/feature-banner.jpg", "/feature-banner-2.jpg", "/feature-banner-3.jpg"];
 
 const INTERVAL = 650;
 
@@ -31,29 +27,16 @@ export default function FeatureBanner() {
   return (
     <section className="feature-banner" aria-label="Featured collection">
       <div className="feature-stage">
-        {SCENES.map((s, i) => (
+        {SCENES.map((src, i) => (
           <Image
-            key={s.backdrop}
+            key={src}
             className={`feature-img ${i === idx ? "is-active" : ""}`}
-            src={s.backdrop}
+            src={src}
             alt=""
             fill
             sizes="100vw"
             priority={i === 0}
             // on a timer, so every scene must be ready before its turn
-            loading={i === 0 ? undefined : "eager"}
-          />
-        ))}
-
-        {SCENES.map((s, i) => (
-          <Image
-            key={s.case}
-            className={`feature-case ${i === idx ? "is-active" : ""}`}
-            src={s.case}
-            alt=""
-            width={420}
-            height={630}
-            priority={i === 0}
             loading={i === 0 ? undefined : "eager"}
           />
         ))}

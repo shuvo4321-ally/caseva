@@ -289,6 +289,14 @@ export default function Home() {
             if ("scrollRestoration" in history) history.scrollRestoration = "auto";
             overlay.style.display = "none";
             overlay.style.pointerEvents = "none";
+            // The hero's entrance is a fromTo starting at scale 1.05, and
+            // fromTo applies its from-state the moment the timeline is built.
+            // If the timeline never finishes — failsafe fires, the tab is
+            // backgrounded mid-intro (rAF pauses, so GSAP stops advancing), or
+            // the user taps to skip — its clearProps never runs and the hero
+            // stays at 1.05, overflowing ~9px and shifting all hero content
+            // left. Clearing it here makes the hand-off idempotent.
+            gsap.set(".hero", { clearProps: "transform,transformOrigin" });
             // The intro timeline's OWN case-reveal (PHASE 6 below) has fully
             // resolved by the time this onComplete fires, so it's safe to
             // create the scroll-parallax now — no race with it.
@@ -946,13 +954,19 @@ export default function Home() {
         const wash: Array<{ sel: string; color: string; at?: number }> = [
           { sel: ".value-prop", color: "#b2cdff" },      // blue
           { sel: ".cheers", color: "#fce5e5" },          // soft pink
-          // The feature carousel opens .collection-wrap and is transparent, so
-          // this wash colour IS its background — a soft periwinkle band.
-          { sel: ".collection-wrap", color: "#cfdcfb" }, // soft periwinkle
+          // The feature banner opens .collection-wrap and is transparent, so this
+          // wash colour IS its frame. The photography is warm (hues 21-23) and
+          // mid-dark (L39-57); the old periwinkle sat at 220/L90, so the shots
+          // were marooned in a cool pale band. A warm blush keeps them in the
+          // same family.
+          { sel: ".collection-wrap", color: "#f3e7de" }, // warm blush
           // Product carousel keeps its CASETiFY grey; a higher `at` greys the
           // body a little later so the feature band is mostly scrolled off
           // before it engages.
-          { sel: ".product-row", color: "#ffffff", at: 0.25 }, // bright product stage
+          // Warm off-white, not pure white: cream (51/L92) -> white (0/L100) was a
+          // temperature flip between consecutive sections, which is what made the
+          // product row read as clinical rather than airy.
+          { sel: ".product-row", color: "#fdfaf2", at: 0.25 }, // warm off-white
           { sel: ".comparison", color: "#cbe8ce" },      // light sage
           { sel: ".testimonial", color: CREAM },         // cream
           { sel: ".subscribe", color: "#e2dbf7" },       // light lavender

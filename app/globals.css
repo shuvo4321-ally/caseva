@@ -164,6 +164,11 @@ input:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* 44x44 hit area (Apple HIG minimum) — the icon itself stays 28px.
+     Negative margin keeps the visual spacing identical to before. */
+  width: 44px;
+  height: 44px;
+  margin: -8px;
   padding: 0;
   position: relative;
 }
@@ -879,7 +884,7 @@ input:focus-visible {
 }
 
 .vp-highlight {
-  color: #e91e63;
+  color: #dd1b5d;
   font-weight: 600;
 }
 
@@ -1003,9 +1008,13 @@ input:focus-visible {
   }
   .cheers-case {
     position: relative !important;
-    width: clamp(300px, 85vw, 500px) !important;
+    /* was 85vw: two stacked at that size made this decorative section 956px,
+       taller than the hero, for no copy and no CTA */
+    width: clamp(200px, 62vw, 400px) !important;
     bottom: auto !important;
   }
+  /* interlock the pair rather than stacking them nose-to-tail */
+  .cheers-case.right { margin-top: -14vw; }
   .cheers-case.left {
     align-self: flex-start !important;
     left: auto !important;
@@ -1054,7 +1063,9 @@ input:focus-visible {
 .feature-stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  /* photos are 3:4 and 2:3 — a 1:1 crop cut ~a third off the tall ones and
+     sliced through the subject. 4:5 crops with the grain instead. */
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   background: #efece4;
 }
@@ -1069,22 +1080,6 @@ input:focus-visible {
 
 .feature-img.is-active { opacity: 1; }
 
-/* The case stands centred on top of the backdrop, slightly overlapping it. */
-.feature-case {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 34%;
-  height: auto;
-  z-index: 1;
-  opacity: 0;
-  object-fit: contain;
-  filter: drop-shadow(0 22px 30px rgba(0, 0, 0, 0.34));
-}
-
-.feature-case.is-active { opacity: 1; }
-
 /* ---- Copy, below the image ---- */
 .feature-copy {
   padding: 26px 24px 0;
@@ -1094,8 +1089,8 @@ input:focus-visible {
 .feature-title {
   font-family: var(--font-fraunces), Georgia, serif;
   font-weight: 900;
-  font-size: clamp(30px, 5vw, 46px);
-  line-height: 1.08;
+  font-size: clamp(25px, 4vw, 38px);
+  line-height: 1.1;
   margin: 0 0 12px;
   color: #111;
 }
@@ -1110,7 +1105,9 @@ input:focus-visible {
 .feature-cta {
   display: inline-flex;
   align-items: center;
-  background: #111;
+  /* brand blue, matching the hero CTA — two colours for the same action
+     (both go to /shop) read as two different levels of importance */
+  background: #2540ad;
   color: #fff;
   font-family: inherit;
   font-weight: 600;
@@ -1121,11 +1118,10 @@ input:focus-visible {
   transition: background 0.2s ease, transform 0.15s ease;
 }
 
-.feature-cta:hover { background: #2540ad; transform: translateY(-2px); }
+.feature-cta:hover { background: #1c3580; transform: translateY(-2px); }
 
 @media (min-width: 760px) {
   .feature-stage { aspect-ratio: 16 / 10; }
-  .feature-case { width: 20%; }
   .feature-copy { padding: 32px 40px 0; }
 }
 
@@ -1321,6 +1317,10 @@ input:focus-visible {
 
 /* Card link wrapper */
 .collection-card-link {
+  /* without this the anchor resolves to the UA default link blue
+     (rgb(0,0,238)); invisible today only because every child sets its own
+     colour, but any unstyled text added inside would render browser-blue */
+  color: inherit;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -1331,11 +1331,17 @@ input:focus-visible {
 
 .casetify-img-bg {
   position: relative;
-  background: transparent;
-  padding: 6px;
+  /* soft warm tile: gives the case a ground so it sits rather than floats,
+     and keeps the row in the cream family instead of clinical white */
+  background: #f7f3e8;
+  /* 16px matches .shopcard-media — the same object (a product tile) should not
+     change radius just because it moved to another page */
+  border-radius: 16px;
+  padding: 10px 6px;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 .casetify-img-bg img {
@@ -1344,11 +1350,17 @@ input:focus-visible {
   aspect-ratio: 2 / 3;
   object-fit: contain;
   display: block;
+  /* The PNGs carry transparent margin: the case fills ~60% of the width but
+     up to 87% of the HEIGHT. Height is therefore the binding constraint —
+     1.34 pushed it to 117% and the tile clipped the case. 1.10 lands at ~96%,
+     bigger than before with no clipping on the tallest artwork. */
+  transform: scale(1.10);
+  transform-origin: center;
   transition: transform 0.4s ease;
 }
 
 .casetify-style:hover .casetify-img-bg img {
-  transform: scale(1.04);
+  transform: scale(1.15);
 }
 
 /* Badges */
@@ -1369,7 +1381,7 @@ input:focus-visible {
 .card-badge-sale {
   left: auto;
   right: 12px;
-  background: #e91e63;
+  background: #dd1b5d;
 }
 
 .casetify-card-body {
@@ -1409,7 +1421,8 @@ input:focus-visible {
 }
 
 .price-was {
-  color: #a0a096;
+  /* was #a0a096 = 2.48 contrast on cream, below the 4.5 minimum */
+  color: #64645e;
   text-decoration: line-through;
   font-weight: 500;
 }
@@ -1514,6 +1527,7 @@ input:focus-visible {
 .sort-btn {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 6px;
   background: transparent;
   border: none;
@@ -1680,10 +1694,15 @@ input:focus-visible {
 
 .fs-pill:hover { border-color: #b8b3a3; }
 
+/* Selected state reads as a STATE, not a button: tinted fill + brand border.
+   Previously this was solid #2540ad with a 50px radius and 700 weight —
+   pixel-identical to the Apply button, so "this option is chosen" and "this
+   commits your choices" were the same object. Solid blue is now reserved for
+   Apply alone. */
 .fs-pill.is-active {
-  background: #2540ad;
+  background: rgba(37, 64, 173, 0.12);
   border-color: #2540ad;
-  color: #fff;
+  color: #2540ad;
   font-weight: 700;
 }
 
@@ -1784,7 +1803,12 @@ input:focus-visible {
   position: relative;
   aspect-ratio: 1 / 1.18;
   overflow: hidden;
-  background: transparent;
+  /* Pastel cases (L76-86) on a cream page (L92) have only ~1.6 contrast — they
+     dissolve into the ground. A warm tile plus a contact shadow (below) gives
+     separation through depth rather than value, which is how pale-on-pale
+     product photography is normally resolved. Matches the home card tile. */
+  background: #f7f3e8;
+  border-radius: 16px;
 }
 
 /* Absolute fill so height:100% resolves against the box (a centered grid item
@@ -1797,6 +1821,13 @@ input:focus-visible {
   height: 100%;
   padding: 12px 10px;
   object-fit: contain;
+  /* Contact shadow — grounds the case so it sits on the tile rather than
+     floating over it. Kept deliberately tight: the tile clips overflow, and
+     the lowest-sitting asset (pink-floral-case-v2) leaves only 14.2px beneath
+     the case, so a wider shadow gets sliced flat against the tile edge.
+     4px offset + 6px blur stays inside that budget on every product image —
+     and a tight, dark shadow reads more like real contact anyway. */
+  filter: drop-shadow(0 4px 6px rgba(60, 50, 40, 0.22));
   transition: transform 0.35s ease;
 }
 
@@ -1832,6 +1863,10 @@ input:focus-visible {
 }
 
 .shopcard-name {
+  /* the bare inline anchor measured 21px tall — under the 24px minimum tap
+     target; padding lifts it without moving the text */
+  display: inline-block;
+  padding: 3px 0;
   font-size: 16px;
   font-weight: 700;
   line-height: 1.3;
@@ -1870,10 +1905,13 @@ input:focus-visible {
   align-items: center;
   gap: 6px;
   padding: 9px 18px;
-  border: none;
+  /* Outlined, not solid black: at 17.78 contrast a filled button out-shouted
+     the product it sells (~1.6) by 11x. Outline keeps it findable without
+     making it the loudest thing in the card. */
+  border: 1.5px solid #111;
   border-radius: 50px;
-  background: #111;
-  color: #fff;
+  background: transparent;
+  color: #111;
   font-family: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -1882,9 +1920,9 @@ input:focus-visible {
 }
 
 .shopcard-add svg { width: 15px; height: 15px; }
-.shopcard-add:hover { background: #2540ad; }
+.shopcard-add:hover { background: #111; color: #fff; }
 .shopcard-add:active { transform: translateY(1px); }
-.shopcard-add.is-added { background: #2540ad; }
+.shopcard-add.is-added { background: #2540ad; border-color: #2540ad; color: #fff; }
 
 @media (max-width: 1280px) {
   .shop-grid { grid-template-columns: repeat(4, 1fr); }
@@ -1937,6 +1975,9 @@ input:focus-visible {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
+  /* 44px tap height; negative margin keeps it optically aligned with the title */
+  min-height: 44px;
+  margin: -13px 0;
   gap: 7px;
   font-size: 14px;
   font-weight: 700;
@@ -2017,25 +2058,39 @@ input:focus-visible {
 
 .product-row-dots {
   display: flex;
-  gap: 12px;
+  gap: 0;
 }
 
+/* The button is a 24x24 hit area (WCAG 2.5.8 AA); the visible dot is drawn by
+   ::before, so the dots look identical but are actually tappable. 44px would
+   overlap at this density. */
 .row-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(37, 64, 173, 0.25); /* Faded blue for inactive dots */
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  background: none;
   border: none;
   padding: 0;
   cursor: pointer;
+}
+
+.row-dot::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(37, 64, 173, 0.25);
   transition: width 0.3s ease, border-radius 0.3s ease, background 0.3s ease;
 }
 
-.row-dot.is-active {
+.row-dot.is-active::before {
   width: 24px;
   border-radius: 4px;
-  background: #2540ad; /* Brand blue for active dot */
+  background: #2540ad;
 }
+
+.row-dot.is-active { width: 40px; }
 
 .product-row-nav {
   position: absolute;
@@ -2293,7 +2348,10 @@ input:focus-visible {
   color: #6a6a5a;
   text-decoration: none;
   font-size: 15px;
-  margin-bottom: 10px;
+  /* was 20px tall — padding brings the tap row to 44px (margin traded for
+     padding so the visual spacing is unchanged) */
+  padding: 12px 0;
+  margin-bottom: 0;
   transition: color .2s ease;
 }
 
@@ -3000,7 +3058,7 @@ input:focus-visible {
 
 
   .product-row {
-    padding: 60px 0;
+    padding: 30px 0 24px;
   }
 
   .logo {
@@ -3165,7 +3223,9 @@ input:focus-visible {
 
   /* Hero = one composed screen: copy on top, product fan anchored at the bottom */
   .hero {
-    padding: 12px 18px 24px;
+    /* 24px matches the nav logo and every section below — the hero was at 18
+       and read as a 6px misalignment against the rest of the page */
+    padding: 12px 24px 24px;
     flex-direction: column;
     align-items: stretch;
     /* No forced full-screen height on mobile — that left a large empty gap
@@ -3299,7 +3359,12 @@ input:focus-visible {
      phone screen, reading as an oversized gap above/below the text. Trim it
      down (not away — the centered feel above the text is intentional). */
   .value-prop {
+    /* Vertical rhythm restored: this gap between the hero and the hands is
+       deliberate breathing room — trimming it made the page feel rushed.
+       Horizontal padding stays 0 because the inner .container already supplies
+       the 24px gutter; having it here too double-guttered the text to 48px. */
     min-height: 52vh;
+    padding: 70px 0;
   }
 
   /* Decorative corner cases are positioned to bleed past their section edges
