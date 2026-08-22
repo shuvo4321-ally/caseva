@@ -1009,21 +1009,31 @@ input:focus-visible {
   .cheers-case {
     position: relative !important;
     /* was 85vw: two stacked at that size made this decorative section 956px,
-       taller than the hero, for no copy and no CTA */
-    width: clamp(200px, 62vw, 400px) !important;
+       taller than the hero, for no copy and no CTA. 68vw is the balance —
+       big enough to read as the hero image, small enough to stay short. */
+    width: clamp(220px, 68vw, 430px) !important;
     bottom: auto !important;
+    /* How far each case hangs past the VIEWPORT edge. Was a flat -60px, which
+       pushed 23% of the case off screen on a 375px phone and 27% on a 320px
+       one — that crop was cutting into the case body, not just the wrist it
+       is meant to trim. Capped at 30px so it stops growing once the width
+       clamp tops out, otherwise tablets crop harder than phones. */
+    --cheers-bleed: clamp(20px, 7.5vw, 30px);
   }
-  /* interlock the pair rather than stacking them nose-to-tail */
-  .cheers-case.right { margin-top: -14vw; }
+  /* interlock the pair rather than stacking them nose-to-tail; -20vw buys back
+     most of the height the larger cases cost. The two never collide: the right
+     case's top rows are fully transparent where they meet the left case. */
+  .cheers-case.right { margin-top: -20vw; }
   .cheers-case.left {
     align-self: flex-start !important;
     left: auto !important;
-    margin-left: -60px;
+    /* stage is inset by .cheers' 16px padding at this breakpoint */
+    margin-left: calc(-16px - var(--cheers-bleed));
   }
   .cheers-case.right {
     align-self: flex-end !important;
     right: auto !important;
-    margin-right: -60px;
+    margin-right: calc(-16px - var(--cheers-bleed));
   }
 }
 
@@ -3388,14 +3398,10 @@ input:focus-visible {
     padding: 6vw 6px 0;
   }
 
-  .cheers-stage {
-    height: 58vw;
-  }
-
-  .cheers-case {
-    width: 45vw;
-    bottom: -13vw;
-  }
+  /* the stage is inset by only 6px here, not 16px, so the bleed offset has to
+     be rebased or the cases sit 10px further out than intended */
+  .cheers-case.left { margin-left: calc(-6px - var(--cheers-bleed)); }
+  .cheers-case.right { margin-right: calc(-6px - var(--cheers-bleed)); }
 
   .compare-grid {
     grid-template-columns: 1fr;
