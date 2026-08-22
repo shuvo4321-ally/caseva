@@ -40,6 +40,19 @@ body {
   /* hero cream — the page opens on this; the scroll wash takes over below */
 }
 
+/* The product page is where a case is actually JUDGED, so it gets a neutral
+   ground rather than the brand cream: at C* 17.9 the cream is a strong hue
+   that every product has to negotiate with, and a warm cream flatters warm
+   cases while fighting cool ones. #f4f4f2 is C* 1.0 — neutral enough that any
+   colourway lands the same way on it, which is the whole point of a studio
+   backdrop. Deliberately NOT pure white: white gives no edge to a white case,
+   and the catalogue will not stay this pale forever.
+   (The home scroll-wash writes body's background inline and clears it on
+   unmount, so this rule is what applies once you land here.) */
+body:has(.pdp-page) {
+  background-color: #f4f4f2;
+}
+
 
 /* Skip link — visible only when focused (keyboard a11y) */
 .skip-link {
@@ -1373,10 +1386,8 @@ input:focus-visible {
 
 .casetify-img-bg {
   position: relative;
-  /* Same lifted-card stage as .shopcard-media — see there for the reasoning.
-     Lighter than the wash at every point the row is on screen, so it holds as
-     a card while the colour moves underneath. */
-  background: #fffdf7;
+  /* No tile — see .shopcard-media. The case sits straight on the wash. */
+  background: transparent;
   /* 16px matches .shopcard-media — the same object (a product tile) should not
      change radius just because it moved to another page */
   border-radius: 16px;
@@ -1845,25 +1856,20 @@ input:focus-visible {
 .shopcard-media {
   position: relative;
   aspect-ratio: 1 / 1.18;
-  overflow: hidden;
-  /* The tile is the product's STAGE — a lifted card the case sits on, with the
-     brand yellow left alone around it.
-
-     Direction is the whole trick. The old #f7f3e8 sat 1.7 L* BELOW the page
-     and 12 chroma units flatter, and a patch that is darker AND duller than
-     its surround reads as a stain — that is what looked dirty. Going the
-     other way, lighter and cleaner, reads as a card instead, which is what
-     CASETiFY's near-white product ground is doing.
-
-     #fffdf7 is L*99.3 C*3.1: lighter than EVERY ground a tile can sit on
-     (+1.7 on /shop, +1.0 to +10.0 across the home wash), so it reads as a
-     card everywhere without having to match anything. That is why it is
-     robust where a hue-matched tile was not — matching has to be re-solved
-     for every background, lifting does not.
-
-     It also separates the products better than the tile it replaces: the
-     worst case goes from dE 6.0 to 8.0, and every product improves. */
-  background: #fffdf7;
+  /* No overflow clip: there is no tile to clip TO any more, and the contact
+     shadow needs the room. The lowest-sitting asset leaves 14.2px under the
+     case while the shadow reaches 21px, so clipping would slice it flat. The
+     image itself cannot overflow (object-fit: contain inside padding). */
+  /* NO tile. Every tile colour tried here was solving the wrong problem: a
+     panel behind the case is one more rectangle competing with the product,
+     and on a coloured page it can only ever be a compromise. Measured against
+     the page directly, the cases actually separate BETTER with nothing behind
+     them (worst product dE 8.9 on the cream, vs 8.0 for the best tile) —
+     because the page's yellow is far in hue from the pinks and blues, while
+     any near-white tile sits right next to them.
+     This is OLIPOP's arrangement: product cards transparent, one ground.
+     Grounding is the contact shadow's job now, not a panel's. */
+  background: transparent;
   border-radius: 16px;
 }
 
@@ -1882,8 +1888,10 @@ input:focus-visible {
      the lowest-sitting asset (pink-floral-case-v2) leaves only 14.2px beneath
      the case, so a wider shadow gets sliced flat against the tile edge.
      4px offset + 6px blur stays inside that budget on every product image —
-     and a tight, dark shadow reads more like real contact anyway. */
-  filter: drop-shadow(0 4px 6px rgba(60, 50, 40, 0.22));
+     and a tight, dark shadow reads more like real contact anyway.
+     With the tile gone this is the ONLY thing separating case from page, so
+     it opens up a little — nothing clips it now. */
+  filter: drop-shadow(0 6px 10px rgba(60, 50, 40, 0.20));
   transition: transform 0.35s ease;
 }
 
