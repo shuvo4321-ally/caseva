@@ -134,7 +134,7 @@ export default function Home() {
   // back to the CSS site cream (#fbf3dc), which matches the header.
   useEffect(() => {
     return () => {
-      document.body.style.backgroundColor = "";
+      document.body.style.removeProperty("--page-ground");
     };
   }, []);
 
@@ -1014,7 +1014,10 @@ export default function Home() {
           const next = colorAt(window.scrollY);
           if (next === lastWash) return;
           lastWash = next;
-          document.body.style.backgroundColor = next;
+          // Writes the page-ground TOKEN, not background-color directly. The
+          // sticky nav reads the same token, so it washes with the page instead
+          // of staying frozen on the opening cream over a blue or green section.
+          document.body.style.setProperty("--page-ground", next);
         };
         buildStops();
         paintWash();
