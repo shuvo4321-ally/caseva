@@ -248,20 +248,63 @@ export const facetCount = (base: ShopFilters, patch: Partial<ShopFilters>): numb
 // ----- Search -----
 // Matches name, description, case type and collection tags. Ranked so a name
 // hit outranks a description hit, and a prefix beats a mid-word match.
+const norm = (s: string) =>
+  s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "");
+
+/** Split into searchable words: "MagSafe Case" -> ["magsafe","case"],
+ *  "new-arrivals" -> ["new","arrivals"]. */
+const words = (s: string): string[] => norm(s).split(/[^a-z0-9]+/).filter(Boolean);
+
+/** True when any WORD begins with the token — "blo" hits "Blossom" and
+ *  "Bloom", but "s" no longer hits "Case" just because it contains an s. */
+const hasWordStarting = (haystack: string[], token: string) =>
+  haystack.some((w) => w.startsWith(token));
+
+/**
+ * Search is word-PREFIX based, not substring based, and every token has to
+ * match something (AND, not OR).
+ *
+ * The previous version scored with plain `includes()` across name, caseType,
+ * collections and description, which made short queries match everything:
+ * "s" hit all five products at once — through "Clear Case", the "sale" and
+ * "bestsellers" collections, and the prose — even though no product is named
+ * with an s. Substring matching on a letter is meaningless.
+ *
+ * How far a token is allowed to reach is tied to how specific it is. One
+ * letter searches names only; two letters may reach the case type and
+ * collections; three or more may reach the description, where a common word
+ * would otherwise drag in the whole catalogue.
+ */
 export const searchProducts = (raw: string): Product[] => {
-  const q = raw.trim().toLowerCase();
-  if (!q) return [];
+  const query = norm(raw).trim();
+  if (!query) return [];
+  const tokens = query.split(/[^a-z0-9]+/).filter(Boolean);
+  if (!tokens.length) return [];
+
   const scored = PRODUCTS.map((p) => {
-    const name = p.name.toLowerCase();
-    let score = 0;
-    if (name === q) score = 100;
-    else if (name.startsWith(q)) score = 80;
-    else if (name.includes(q)) score = 60;
-    else if (p.caseType.toLowerCase().includes(q)) score = 40;
-    else if (p.collections.some((c) => c.includes(q))) score = 30;
-    else if (p.description.toLowerCase().includes(q)) score = 20;
-    return { p, score };
+    const nameWords = words(p.name);
+    const typeWords = words(p.caseType);
+    const collWords = p.collections.flatMap(words);
+    const descWords = words(p.description);
+    const name = norm(p.name);
+
+    let total = 0;
+    for (const t of tokens) {
+      let best = 0;
+      if (name === t) best = 100;
+      else if (name.startsWith(t)) best = 80;
+      else if (hasWordStarting(nameWords, t)) best = 60;
+      else if (t.length >= 2 && hasWordStarting(typeWords, t)) best = 35;
+      else if (t.length >= 2 && hasWordStarting(collWords, t)) best = 25;
+      else if (t.length >= 3 && hasWordStarting(descWords, t)) best = 12;
+      // one token matching nothing disqualifies the product: searching
+      // "pink tulip" should find neither, not both
+      if (best === 0) return { p, score: 0 };
+      total += best;
+    }
+    return { p, score: total };
   }).filter((x) => x.score > 0);
-  scored.sort((a, b) => b.score - a.score);
+
+  scored.sort((a, b) => b.score - a.score || a.p.name.localeCompare(b.p.name));
   return scored.map((x) => x.p);
 };
