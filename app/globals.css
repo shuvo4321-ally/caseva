@@ -1058,12 +1058,13 @@ input:focus-visible {
      and 640px breakpoints), and adjacency is exactly the condition we mean. */
   .cheers + .collection-wrap {
     padding-top: 0;
-    /* Only has to swallow the flat cut at the case's bottom EDGE, so it wants
-       to be as small as it can safely be — every extra pixel is hand that the
-       banner eats instead. 32px was cutting through the palm; 12px still
-       clears the edge by ~6x any sub-pixel rounding and gives the black case
-       20px more room, so the banner meets the wrist rather than the fingers. */
-    margin-top: -12px;
+    /* Two things have to be true at once here: no strip of page background
+       between the arm and the banner (the 16px padding-top used to leave one),
+       and as little of the hand eaten as possible. Both are satisfied by the
+       SMALLEST overlap that still covers the flat cut at the case's bottom
+       edge. 8px is that: it beats any sub-pixel layout rounding several times
+       over, while the wrist now runs flush into the banner. */
+    margin-top: -8px;
   }
 }
 
