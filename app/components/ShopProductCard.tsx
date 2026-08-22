@@ -6,13 +6,17 @@ import { useEffect, useRef, useState } from "react";
 import { useCart } from "../cart-context";
 import { type Product, DEFAULT_MODEL, formatPrice } from "../data/products";
 
-// Flat catalog card for /shop (distinct from the home carousel card): image
-// with carousel dots, then product name, device, case-type, price, and an
-// "Add" button with a cart icon.
+// Flat catalog card for /shop (distinct from the home carousel card): the
+// primary packshot, then product name, device, case-type, price, and an "Add"
+// button with a cart icon.
+//
+// No carousel here on purpose. A grid is for COMPARING products, so every card
+// should show the same thing — the primary shot — and let the shopper scan
+// across. Per-card dots ask them to browse inside a thumbnail instead, which
+// competes with the scan and duplicates what the product page does properly.
 export default function ShopProductCard({ product, device }: { product: Product; device: string }) {
   const { addItem, openDrawer } = useCart();
   const [added, setAdded] = useState(false);
-  const [idx, setIdx] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
@@ -35,20 +39,7 @@ export default function ShopProductCard({ product, device }: { product: Product;
   return (
     <article className="shopcard">
       <Link className="shopcard-media" href={`/product/${product.slug}`} aria-label={product.name}>
-        <Image src={imgs[idx] ?? imgs[0]} alt={product.alt} width={360} height={540} />
-        {imgs.length > 1 && (
-          <div className="shopcard-dots">
-            {imgs.map((img, i) => (
-              <button
-                key={img}
-                type="button"
-                className={`shopcard-dot ${i === idx ? "is-active" : ""}`}
-                aria-label={`Image ${i + 1}`}
-                onClick={(e) => { e.preventDefault(); setIdx(i); }}
-              />
-            ))}
-          </div>
-        )}
+        <Image src={imgs[0]} alt={product.alt} width={360} height={540} />
       </Link>
 
       <div className="shopcard-body">

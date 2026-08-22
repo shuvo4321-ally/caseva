@@ -1908,29 +1908,6 @@ input:focus-visible {
 
 .shopcard:hover .shopcard-media img { transform: scale(1.04); }
 
-.shopcard-dots {
-  position: absolute;
-  bottom: 12px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-}
-
-.shopcard-dot {
-  width: 7px;
-  height: 7px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.22);
-  cursor: pointer;
-  transition: width 0.2s ease, background 0.2s ease, border-radius 0.2s ease;
-}
-
-.shopcard-dot.is-active { width: 18px; border-radius: 4px; background: #111; }
-
 .shopcard-body {
   display: flex;
   flex-direction: column;
