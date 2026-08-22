@@ -1016,9 +1016,16 @@ input:focus-visible {
     /* How far each case hangs past the VIEWPORT edge. Was a flat -60px, which
        pushed 23% of the case off screen on a 375px phone and 27% on a 320px
        one — that crop was cutting into the case body, not just the wrist it
-       is meant to trim. Capped at 30px so it stops growing once the width
-       clamp tops out, otherwise tablets crop harder than phones. */
-    --cheers-bleed: clamp(20px, 7.5vw, 30px);
+       is meant to trim.
+
+       This tracks the CASE width, not the viewport, because what it has to
+       clear is a feature of the image: the left PNG's forearm is cut flat at
+       the image bottom across 10.93% of its width, and that flat edge only
+       reads correctly when it sits past the screen edge. 12% clears it with a
+       little margin at every size. A viewport-based value cannot do this — it
+       keeps growing after the width clamp tops out, yet still fell short from
+       412px upward, which is exactly where the cut was showing. */
+    --cheers-bleed: calc(0.12 * clamp(220px, 68vw, 430px));
   }
   /* interlock the pair rather than stacking them nose-to-tail; -20vw buys back
      most of the height the larger cases cost. The two never collide: the right
@@ -1034,6 +1041,24 @@ input:focus-visible {
     align-self: flex-end !important;
     right: auto !important;
     margin-right: calc(-16px - var(--cheers-bleed));
+  }
+
+  /* Both cheers PNGs are cut flat at the image bottom — the forearm simply
+     stops. That edge is only invisible when it runs off a boundary. Stacked,
+     the right case's cut lands at the section bottom with ~23px of it on
+     screen at 412px, ending in mid-air.
+
+     So give it a boundary: pull the collection up until its opaque, full-bleed
+     feature banner starts above that line, and the arm reads as running BEHIND
+     the next section. .collection-wrap is position:relative and later in the
+     DOM, so it already paints over the cases — no z-index needed.
+
+     Specificity 0,2,0 deliberately: it has to outrank the plain
+     .collection-wrap padding rules that come LATER in this file (at the 900px
+     and 640px breakpoints), and adjacency is exactly the condition we mean. */
+  .cheers + .collection-wrap {
+    padding-top: 0;
+    margin-top: -32px;
   }
 }
 
