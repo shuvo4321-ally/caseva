@@ -2668,16 +2668,67 @@ input:focus-visible {
   align-items: start;
 }
 
-.pdp-main-img {
-  background: transparent;
-  border-radius: 24px;
-  padding: 44px;
+/* Horizontal snap track. Images sit side by side and are swiped, so N photos
+   occupy the height of ONE — the reason a multi-image product does not push
+   the title, price and Add to cart off the first screen. */
+.pdp-track {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* Capped against the viewport, not the artwork. A 600x900 render in a 562px
+     column is 843px tall, which towers over the info column beside it and
+     pushes the price below the fold on a laptop too. */
+  height: min(72vh, 620px);
+  /* keeps a horizontal swipe from being stolen as a page scroll */
+  overscroll-behavior-x: contain;
+}
+.pdp-track::-webkit-scrollbar { display: none; }
+
+.pdp-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
 
-.pdp-main-img img {
+.pdp-slide img {
   width: 100%;
   height: auto;
+  max-height: 100%;
+  object-fit: contain;
   display: block;
+  /* same contact shadow as the catalogue — the case is on a bare ground here
+     too, so depth is what separates it */
+  filter: drop-shadow(0 10px 18px rgba(60, 50, 40, 0.18));
+}
+
+/* Dots — on a phone the track is swiped, so this is the only thing telling
+   you more photos exist. Hidden on desktop, where the thumbnails say it. */
+.pdp-dots {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 14px;
+}
+.pdp-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(17, 17, 17, 0.22);
+  transition: background 0.2s ease, width 0.2s ease;
+}
+.pdp-dot.is-active {
+  width: 20px;
+  border-radius: 4px;
+  background: #2540ad;
+}
+
+@media (min-width: 861px) {
+  .pdp-dots { display: none; }
 }
 
 .pdp-thumbs {
@@ -3114,7 +3165,30 @@ input:focus-visible {
   /* PDP + checkout stack to a single column on narrow screens */
   .pdp {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 22px;
+  }
+
+  /* Fold discipline. Stacked, the gallery is the first thing on screen and it
+     was eating 502px of a 900px viewport, pushing Add to cart to y=1034 —
+     off screen before a single extra photo was added. Capping it against the
+     VIEWPORT rather than the image keeps the case large while guaranteeing
+     the name and price are visible on landing whatever the phone size. */
+  .pdp-track {
+    height: min(46vh, 420px);
+  }
+
+  .pdp-slide {
+    padding: 8px 16px;
+  }
+
+  .pdp-page {
+    padding-top: 20px;
+  }
+
+  /* Thumbnails are a pointer affordance; on touch the track is swiped and the
+     dots report position, so the strip is redundant weight here. */
+  .pdp-thumbs {
+    display: none;
   }
 
   .pdp-title {

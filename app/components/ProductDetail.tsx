@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "../cart-context";
 import ProductRow from "./ProductRow";
 import ModelSelector from "./ModelSelector";
@@ -42,6 +42,24 @@ export default function ProductDetail({
     try { window.localStorage.setItem(MODEL_STORAGE_KEY, m); } catch { /* ignore */ }
   };
 
+  // The track is the single source of truth for which image is showing:
+  // swiping it updates the dots/thumbs, and clicking a thumb scrolls it. That
+  // keeps touch and pointer on the same state instead of two rival ones.
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const onTrackScroll = () => {
+    const el = trackRef.current;
+    if (!el) return;
+    const i = Math.round(el.scrollLeft / el.clientWidth);
+    setActiveImage((prev) => (prev === i ? prev : i));
+  };
+
+  const goToImage = (i: number) => {
+    const el = trackRef.current;
+    if (!el) return setActiveImage(i);
+    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+  };
+
   const line = () => ({
     slug: product.slug,
     name: product.name,
@@ -56,25 +74,56 @@ export default function ProductDetail({
   return (
     <main id="main" tabIndex={-1} className="pdp-page">
       <div className="container pdp">
-        {/* Gallery */}
+        {/* Gallery — a horizontal snap track, not a stack. Extra photos cost
+            horizontal room, so a product with six images lands on screen at
+            exactly the same height as one with a single image, and the title
+            and price stay where the shopper expects them. */}
         <div className="pdp-gallery">
-          <div className="pdp-main-img">
-            <Image src={product.images[activeImage]} alt={product.alt} width={600} height={900} priority />
+          <div
+            className="pdp-track"
+            ref={trackRef}
+            onScroll={onTrackScroll}
+            role="group"
+            aria-label={`${product.name} images`}
+          >
+            {product.images.map((img, i) => (
+              <div className="pdp-slide" key={img}>
+                <Image
+                  src={img}
+                  alt={i === 0 ? product.alt : `${product.name}, view ${i + 1}`}
+                  width={600}
+                  height={900}
+                  priority={i === 0}
+                />
+              </div>
+            ))}
           </div>
+
           {product.images.length > 1 && (
-            <div className="pdp-thumbs">
-              {product.images.map((img, i) => (
-                <button
-                  key={img}
-                  type="button"
-                  className={`pdp-thumb ${i === activeImage ? "is-active" : ""}`}
-                  aria-label={`View image ${i + 1}`}
-                  onClick={() => setActiveImage(i)}
-                >
-                  <Image src={img} alt="" width={90} height={135} />
-                </button>
-              ))}
-            </div>
+            <>
+              {/* Dots: on a phone the track is swiped, so this is the only
+                  affordance telling you more photos exist. */}
+              <div className="pdp-dots" aria-hidden="true">
+                {product.images.map((img, i) => (
+                  <span key={img} className={`pdp-dot ${i === activeImage ? "is-active" : ""}`} />
+                ))}
+              </div>
+
+              <div className="pdp-thumbs">
+                {product.images.map((img, i) => (
+                  <button
+                    key={img}
+                    type="button"
+                    className={`pdp-thumb ${i === activeImage ? "is-active" : ""}`}
+                    aria-label={`View image ${i + 1}`}
+                    aria-current={i === activeImage}
+                    onClick={() => goToImage(i)}
+                  >
+                    <Image src={img} alt="" width={90} height={135} />
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
