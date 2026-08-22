@@ -40,6 +40,24 @@ body {
   /* hero cream — the page opens on this; the scroll wash takes over below */
 }
 
+/* /shop gets a PRODUCT ground, not the hero ground.
+   Measured on the live references: the ground behind product photography is
+   always near-neutral — CASETiFY /w is C* 0.0 (#ffffff), OLIPOP's collection
+   list is C* 6.9 (#fff6ea), and OLIPOP is about as colourful as a brand gets.
+   /shop had simply inherited the hero yellow at C* 17.9 — 2.6x the most
+   saturated reference — and no tile colour can sit calmly on a ground that
+   saturated. That, not the tile, is why the tiles read as dirty patches.
+
+   #fdfaf2 is C* 4.2, landing between the two references, and it is not a new
+   colour: it is the wash stop the HOME product row already sits on. The home
+   row always had a product ground; /shop never did.
+
+   The brand yellow keeps the whole home page and the blue banner still leads
+   this one — the calm only extends to where products are being judged. */
+body:has(.shop-page) {
+  background-color: #fdfaf2;
+}
+
 /* Skip link — visible only when focused (keyboard a11y) */
 .skip-link {
   position: absolute;
@@ -1376,7 +1394,7 @@ input:focus-visible {
      case a ground so it sits rather than floats, and because it is derived
      from whatever is behind it, it stays in the page's own hue as the scroll
      wash moves underneath instead of clashing at every stop but one. */
-  background: rgba(0, 0, 0, 0.07);
+  background: rgba(0, 0, 0, 0.05);
   /* 16px matches .shopcard-media — the same object (a product tile) should not
      change radius just because it moved to another page */
   border-radius: 16px;
@@ -1862,8 +1880,14 @@ input:focus-visible {
      colour, slightly deepened: hue drift drops under 5 degrees everywhere,
      dE2000 holds near 3 on every wash instead of swinging 1.9-14.3, and it
      tracks the scroll wash continuously rather than being right at one stop.
-     On /shop it also improves separation for every single product. */
-  background: rgba(0, 0, 0, 0.07);
+     Kept LIGHT at 5%. On the calm /shop ground a stronger tile does not help:
+     sweeping the ink from 5% to 15% makes the worst product WORSE (dE 5.3 ->
+     2.6), because the pale cases straddle the tile's own value — darkening it
+     just walks the tile through them. Colour cannot separate pale-on-pale,
+     which is why CASETiFY runs their tile at dE 1.2 and lets the product's
+     own shadow do it. Ours does the same: the contact shadow below carries
+     the separation, the tile only defines the frame. */
+  background: rgba(0, 0, 0, 0.05);
   border-radius: 16px;
 }
 
