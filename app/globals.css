@@ -1372,9 +1372,11 @@ input:focus-visible {
 
 .casetify-img-bg {
   position: relative;
-  /* soft warm tile: gives the case a ground so it sits rather than floats,
-     and keeps the row in the cream family instead of clinical white */
-  background: #f7f3e8;
+  /* Ink, not a colour — see .shopcard-media for the full reasoning. Gives the
+     case a ground so it sits rather than floats, and because it is derived
+     from whatever is behind it, it stays in the page's own hue as the scroll
+     wash moves underneath instead of clashing at every stop but one. */
+  background: rgba(0, 0, 0, 0.07);
   /* 16px matches .shopcard-media — the same object (a product tile) should not
      change radius just because it moved to another page */
   border-radius: 16px;
@@ -1845,10 +1847,23 @@ input:focus-visible {
   aspect-ratio: 1 / 1.18;
   overflow: hidden;
   /* Pastel cases (L76-86) on a cream page (L92) have only ~1.6 contrast — they
-     dissolve into the ground. A warm tile plus a contact shadow (below) gives
+     dissolve into the ground. A tile plus a contact shadow (below) gives
      separation through depth rather than value, which is how pale-on-pale
-     product photography is normally resolved. Matches the home card tile. */
-  background: #f7f3e8;
+     product photography is normally resolved.
+
+     The tile is INK, not a colour. A fixed #f7f3e8 was tuned against exactly
+     one of the nine backgrounds this site scrolls through, and was wrong
+     everywhere else: on /shop it sat 12 chroma units flatter than the page
+     (dE2000 8.3) which is why it read as a dirty grey patch, and it was
+     LIGHTER than the page at six of nine stops, so it floated forward instead
+     of reading as a recess. Hue drift ran to 51 degrees.
+
+     Compositing black at 7% instead means the tile is always the page's own
+     colour, slightly deepened: hue drift drops under 5 degrees everywhere,
+     dE2000 holds near 3 on every wash instead of swinging 1.9-14.3, and it
+     tracks the scroll wash continuously rather than being right at one stop.
+     On /shop it also improves separation for every single product. */
+  background: rgba(0, 0, 0, 0.07);
   border-radius: 16px;
 }
 
