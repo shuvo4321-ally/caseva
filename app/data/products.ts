@@ -60,6 +60,11 @@ export const PRODUCTS: Product[] = [
   },
   {
     slug: "blue-blossom",
+    // PLACEHOLDER compatibility — replace with real fitment.
+    fitsModels: [
+      "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16",
+      "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15",
+    ],
     name: "Blue Blossom",
     price: 34,
     images: ["/blue-case-hero.png", "/cream-floral-case-v2.png", "/rose-case-v2.png", "/feature-banner-2.jpg"],
@@ -73,6 +78,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     slug: "pink-bloom",
+    // PLACEHOLDER compatibility — replace with real fitment.
+    fitsModels: ["iPhone 16 Pro", "iPhone 15 Pro", "Pixel 9 Pro", "Pixel 8"],
     name: "Pink Bloom",
     price: 32,
     images: ["/pink-case-hero.png", "/pink-floral-case-v2.png", "/rose-case-v2.png", "/feature-banner-3.jpg"],
@@ -85,6 +92,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     slug: "pink-bow",
+    // PLACEHOLDER compatibility — replace with real fitment.
+    fitsModels: ["Pixel 9 Pro XL", "Pixel 9 Pro", "Pixel 9", "Pixel 8 Pro", "Pixel 8"],
     name: "Pink Bow",
     price: 34,
     images: ["/pink-bow-hero.png", "/pink-floral-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner.jpg"],

@@ -34,10 +34,20 @@ const DEFAULT_DEVICE = "iPhone 16 Pro Max";
 // keep in sync with .fs-sheet / .fs-foot background in globals.css
 const SHEET_BG = "#f4f2ec";
 
-export default function ShopCatalog({ initialFilter = "all" }: { initialFilter?: FilterTag }) {
+export default function ShopCatalog({
+  initialFilter = "all",
+  initialBrand,
+}: {
+  initialFilter?: FilterTag;
+  initialBrand?: string;
+}) {
   const startCollection = COLLECTIONS.some((c) => c.tag === initialFilter) ? initialFilter : "all";
+  // Matched case-insensitively against the real brand list, so ?brand=iphone
+  // works and ?brand=nokia is ignored rather than filtering to nothing.
+  const startBrand =
+    PHONE_BRANDS.find((b) => b.brand.toLowerCase() === (initialBrand ?? "").toLowerCase())?.brand ?? "all";
 
-  const [brand, setBrand] = useState<string>("all");
+  const [brand, setBrand] = useState<string>(startBrand);
   const [model, setModel] = useState<string>("all");
   const [caseType, setCaseType] = useState<string>("all");
   const [collection, setCollection] = useState<FilterTag>(startCollection);
@@ -166,7 +176,9 @@ export default function ShopCatalog({ initialFilter = "all" }: { initialFilter?:
       <div className="container">
         <div className="shop-banner">
           <div className="shop-banner-head">
-            <h1 className="shop-title">All Cases</h1>
+            {/* Arriving from "iPhone Cases" should say so — landing on a
+                filtered grid still titled "All Cases" reads as a broken link. */}
+            <h1 className="shop-title">{brand === "all" ? "All Cases" : `${brand} Cases`}</h1>
           </div>
           <div className="shop-banner-actions">
             <button

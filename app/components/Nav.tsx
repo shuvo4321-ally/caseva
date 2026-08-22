@@ -85,8 +85,12 @@ export default function Nav() {
       </div>
       <div id="nav-menu" className={`nav-menu ${menuOpen ? "is-open" : ""}`}>
         <Link className="nav-menu-link" href="/shop" onClick={() => setMenuOpen(false)}>Shop</Link>
-        <Link className="nav-menu-link" href="/#compare" onClick={() => setMenuOpen(false)}>Why CASEVA</Link>
-        <Link className="nav-menu-link" href="/#subscribe" onClick={() => setMenuOpen(false)}>Subscribe</Link>
+        {/* Shopping a case starts with "which phone do I have", so the menu
+            answers that first. These deep-link into /shop with the brand
+            filter already applied — the same state the filter sheet sets, not
+            a separate listing to keep in sync. */}
+        <Link className="nav-menu-link" href="/shop?brand=iPhone" onClick={() => setMenuOpen(false)}>iPhone Cases</Link>
+        <Link className="nav-menu-link" href="/shop?brand=Pixel" onClick={() => setMenuOpen(false)}>Pixel Cases</Link>
         {/* Cart lives here on mobile (icon hidden from the bar to de-clutter) */}
         <button type="button" className="nav-menu-link nav-menu-cart" aria-label={`Cart, ${count} items`} onClick={cartClick}>
           <span>Cart</span>
