@@ -57,7 +57,21 @@ export default function ProductDetail({
   const goToImage = (i: number) => {
     const el = trackRef.current;
     if (!el) return setActiveImage(i);
-    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+    const target = i * el.clientWidth;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({ left: target, behavior: reduce ? "auto" : "smooth" });
+    // Smooth scrolling is animated by the compositor and can be dropped
+    // outright — backgrounded tabs, some embedded webviews, reduced-motion
+    // shims. When that happens scrollTo is a silent no-op, and the thumbnail
+    // would light up for an image the track never moved to. Re-assert the
+    // position once the animation has had its budget, so the worst case is an
+    // instant jump rather than a lie.
+    window.setTimeout(() => {
+      if (el.scrollLeft !== target) {
+        el.scrollLeft = target;
+        setActiveImage(i);
+      }
+    }, 400);
   };
 
   const line = () => ({
@@ -87,7 +101,11 @@ export default function ProductDetail({
             aria-label={`${product.name} images`}
           >
             {product.images.map((img, i) => (
-              <div className="pdp-slide" key={img}>
+              // A packshot and a lifestyle photo want opposite treatment: the
+              // cut-out needs room and a shadow to sit on the ground, the photo
+              // needs to fill the frame edge to edge. Keyed off the extension
+              // so dropping real photography in just works.
+              <div className={`pdp-slide ${/\.(jpe?g|webp)$/i.test(img) ? "pdp-slide--photo" : ""}`} key={img}>
                 <Image
                   src={img}
                   alt={i === 0 ? product.alt : `${product.name}, view ${i + 1}`}

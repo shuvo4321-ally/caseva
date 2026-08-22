@@ -11,7 +11,14 @@ export type Product = {
   name: string;
   price: number; // display currency below; bKash (Phase 3) will convert to BDT
   salePrice?: number;
-  images: string[]; // gallery — first image is the primary/card image
+  /* Gallery. images[0] is the primary/card image and must stay the real
+     packshot. The rest are PLACEHOLDERS — other renders standing in for
+     alternate angles, plus one lifestyle shot — so the swipe gallery can be
+     built and judged before the real photography exists. Swap them out; the
+     gallery reads whatever length this is.
+     Extensions matter: .png renders as a packshot (contained, with a contact
+     shadow) and .jpg as a lifestyle photo (filling the frame). */
+  images: string[];
   alt: string;
   description: string;
   isNew?: boolean;
@@ -43,7 +50,7 @@ export const PRODUCTS: Product[] = [
     name: "Rose Whisper",
     price: 32,
     salePrice: 27,
-    images: ["/white-rose-hero.png"],
+    images: ["/white-rose-hero.png", "/rose-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner.jpg"],
     alt: "White rose floral case",
     description:
       "Soft ivory scattered with hand-drawn roses. A quiet, romantic everyday case with full drop protection and raised camera guards.",
@@ -55,7 +62,7 @@ export const PRODUCTS: Product[] = [
     slug: "blue-blossom",
     name: "Blue Blossom",
     price: 34,
-    images: ["/blue-case-hero.png"],
+    images: ["/blue-case-hero.png", "/cream-floral-case-v2.png", "/rose-case-v2.png", "/feature-banner-2.jpg"],
     alt: "Blue blossom floral case",
     description:
       "A cool-toned porcelain-blue case scattered with delicate silver blossoms. Impact-tested corners, MagSafe-ready, and slim enough to disappear in your pocket.",
@@ -68,7 +75,7 @@ export const PRODUCTS: Product[] = [
     slug: "pink-bloom",
     name: "Pink Bloom",
     price: 32,
-    images: ["/pink-case-hero.png"],
+    images: ["/pink-case-hero.png", "/pink-floral-case-v2.png", "/rose-case-v2.png", "/feature-banner-3.jpg"],
     alt: "Pink blossom floral case",
     description:
       "Blush pink strewn with tiny blooms — our most-loved signature print. Grippy matte edges, MagSafe-ready, 100% recycled shell.",
@@ -80,7 +87,7 @@ export const PRODUCTS: Product[] = [
     slug: "pink-bow",
     name: "Pink Bow",
     price: 34,
-    images: ["/pink-bow-hero.png"],
+    images: ["/pink-bow-hero.png", "/pink-floral-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner.jpg"],
     alt: "Pink bow-knot case",
     description:
       "Coquette-core bow-knots on a glossy pink base. A little playful, a lot protective — impact-tested to 3 m.",
@@ -93,7 +100,7 @@ export const PRODUCTS: Product[] = [
     slug: "tulip-garden",
     name: "Tulip Garden",
     price: 32,
-    images: ["/tulip-hero.png"],
+    images: ["/tulip-hero.png", "/tulip-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner-2.jpg"],
     alt: "Tulip pattern case",
     description:
       "A cream case with a scattered watercolour tulip garden. Warm, vintage and slim, with raised bezels that keep your screen off the table.",
