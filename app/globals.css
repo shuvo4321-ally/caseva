@@ -2744,10 +2744,23 @@ input:focus-visible {
   border-color: #2540ad;
 }
 
+/* Every thumbnail is the same shape whatever it contains, so the rail reads as
+   one row rather than a ragged set. A packshot is CONTAINED (the whole case
+   stays visible at 42px — cropping it would hide the very thing being chosen);
+   a lifestyle photo is COVERED, since cropping a scene is harmless and
+   letterboxing it would waste the tile. Without this both were object-fit:
+   fill and the landscape photo came out squashed into a portrait box. */
 .pdp-thumb img {
   width: 100%;
   height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: contain;
   display: block;
+}
+
+.pdp-thumb--photo img {
+  object-fit: cover;
+  border-radius: 6px;
 }
 
 .pdp-info {
@@ -3167,7 +3180,8 @@ input:focus-visible {
      VIEWPORT rather than the image keeps the case large while guaranteeing
      the name and price are visible on landing whatever the phone size. */
   .pdp-track {
-    height: min(46vh, 420px);
+    /* trimmed to pay for the thumbnail rail below it */
+    height: min(41vh, 380px);
   }
 
   .pdp-slide {
@@ -3178,9 +3192,34 @@ input:focus-visible {
     padding-top: 20px;
   }
 
-  /* Thumbnails are a pointer affordance; on touch the track is swiped and the
-     dots report position, so the strip is redundant weight here. */
+  /* Thumbnails STAY on touch. Dots only tell you how many photos exist; they
+     do not let you see any of them, so the other images cost a swipe each to
+     discover — the whole complaint. A rail shows every photo on the first
+     screen at once, which is the only arrangement where "I landed and I can
+     already see the other shots" is literally true. It costs ~62px, and the
+     name and price still clear the fold.
+     CASETiFY's own mobile PDP does not solve this: their track is inset 36px
+     and the slides fill it exactly, so the next image sits precisely at the
+     clipping edge and nothing peeks. */
   .pdp-thumbs {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    /* more photos than fit scroll sideways rather than wrapping to a second
+       row, so the gallery's height never depends on how many there are */
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .pdp-thumbs::-webkit-scrollbar { display: none; }
+
+  .pdp-thumb {
+    flex: 0 0 auto;
+    width: 54px;
+    padding: 4px;
+  }
+
+  /* The rail says everything the dots did, and more. */
+  .pdp-dots {
     display: none;
   }
 

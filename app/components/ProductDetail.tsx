@@ -132,7 +132,9 @@ export default function ProductDetail({
                   <button
                     key={img}
                     type="button"
-                    className={`pdp-thumb ${i === activeImage ? "is-active" : ""}`}
+                    className={`pdp-thumb ${i === activeImage ? "is-active" : ""} ${
+                      /\.(jpe?g|webp)$/i.test(img) ? "pdp-thumb--photo" : ""
+                    }`}
                     aria-label={`View image ${i + 1}`}
                     aria-current={i === activeImage}
                     onClick={() => goToImage(i)}
