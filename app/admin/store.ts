@@ -35,6 +35,25 @@ export type Merchandising = {
   tiles: ShowcaseTile[];
 };
 
+export type Review = { quote: string; author: string };
+
+/** Every string the storefront renders that is not part of a product. Each
+ *  field notes where it appears, so a change here is traceable to a screen. */
+export type SiteCopy = {
+  heroHeadline: string;        // app/(store)/page.tsx  h1.headline
+  heroSelectorLabel: string;   // the model selector's placeholder
+  heroCta: string;             // "Shop the Collection"
+  valueProp: string;           // .vp-text — {{...}} marks a highlighted phrase
+  featureTitle: string;        // FeatureBanner h2
+  featureDesc: string;
+  featureCta: string;
+  rowTitle: string;            // "Bestselling Prints" on the home row
+  rowViewAll: string;          // its "View all" link
+  pressKicker: string;         // "As seen in"
+  reviews: Review[];
+  shopTitleAll: string;        // /shop banner when no brand filter is applied
+};
+
 export type OrderLine = { name: string; model: string; qty: number; price: number };
 export type Order = {
   id: string;
@@ -49,6 +68,7 @@ export type AdminData = {
   products: Product[];
   phoneBrands: PhoneBrand[];
   merchandising: Merchandising;
+  copy: SiteCopy;
   orders: Order[];
 };
 
@@ -58,6 +78,29 @@ const SEED_MERCH: Merchandising = {
   promoText: "Free shipping on orders $30+ · Buy 2, get 1 free",
   bannerScenes: ["/feature-banner.jpg", "/feature-banner-2.jpg", "/feature-banner-3.jpg"],
   tiles: SHOWCASE_TILES,
+};
+
+// Verbatim from the components today, so the editor opens showing exactly what
+// the site says rather than approximations.
+const SEED_COPY: SiteCopy = {
+  heroHeadline: "Phone cases pretty enough to keep on.",
+  heroSelectorLabel: "iPhone & Pixel Cases",
+  heroCta: "Shop the Collection",
+  valueProp:
+    "Our {{stylish}} and {{protective}} phone cases combine impact-tested engineering and premium materials trusted by the top designers in the world.",
+  featureTitle: "Ready to stand out?",
+  featureDesc:
+    "Elevate your everyday — turn your phone case into a true reflection of your style, with prints that stay vibrant for years.",
+  featureCta: "Shop now",
+  rowTitle: "Bestselling Prints",
+  rowViewAll: "View all",
+  pressKicker: "As seen in",
+  reviews: [
+    { quote: "Honestly the prettiest case I've owned. Slim but solid.", author: "Vogue" },
+    { quote: "The only phone case that makes me want to take it off less.", author: "Harper's Bazaar" },
+    { quote: "Stylish, durable, sustainable — a rare combo.", author: "Refinery29" },
+  ],
+  shopTitleAll: "All Cases",
 };
 
 // Nothing creates orders yet — checkout is entirely client-side and makes no
@@ -89,6 +132,7 @@ const seed = (): AdminData => ({
   products: structuredClone(PRODUCTS),
   phoneBrands: structuredClone(PHONE_BRANDS),
   merchandising: structuredClone(SEED_MERCH),
+  copy: structuredClone(SEED_COPY),
   orders: structuredClone(SEED_ORDERS),
 });
 
@@ -104,6 +148,7 @@ const read = (): AdminData => {
       products: parsed.products ?? seed().products,
       phoneBrands: parsed.phoneBrands ?? seed().phoneBrands,
       merchandising: parsed.merchandising ?? seed().merchandising,
+      copy: parsed.copy ?? seed().copy,
       orders: parsed.orders ?? seed().orders,
     };
   } catch {
@@ -162,6 +207,33 @@ export const saveMerchandising = async (m: Merchandising): Promise<Merchandising
   data.merchandising = m;
   write(data);
   return m;
+};
+
+// ---------- site copy ----------
+export const getCopy = async (): Promise<SiteCopy> => read().copy;
+
+export const saveCopy = async (copy: SiteCopy): Promise<SiteCopy> => {
+  const data = read();
+  data.copy = copy;
+  write(data);
+  return copy;
+};
+
+// ---------- ordering ----------
+/**
+ * Array order IS carousel order — the home row and shop grid render products
+ * in the order this array holds them. Note `allProductsSorted()` in
+ * products.ts floats every `isNew` product to the front first, so a NEW item
+ * will lead regardless of where it sits here.
+ */
+export const moveProduct = async (slug: string, dir: -1 | 1): Promise<Product[]> => {
+  const data = read();
+  const i = data.products.findIndex((p) => p.slug === slug);
+  const j = i + dir;
+  if (i === -1 || j < 0 || j >= data.products.length) return data.products;
+  [data.products[i], data.products[j]] = [data.products[j], data.products[i]];
+  write(data);
+  return data.products;
 };
 
 // ---------- orders (read-only) ----------

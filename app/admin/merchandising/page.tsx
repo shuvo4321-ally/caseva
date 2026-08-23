@@ -21,9 +21,25 @@ export default function AdminMerchandising() {
   const addScene = () => touch({ ...m, bannerScenes: [...m.bannerScenes, ""] });
   const removeScene = (i: number) =>
     touch({ ...m, bannerScenes: m.bannerScenes.filter((_, n) => n !== i) });
+  // Scene order is the order the stage snaps through, and scene 1 is the one
+  // on screen when the page loads.
+  const moveScene = (i: number, dir: -1 | 1) => {
+    const next = [...m.bannerScenes];
+    const j = i + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[i], next[j]] = [next[j], next[i]];
+    touch({ ...m, bannerScenes: next });
+  };
 
   const setTile = (i: number, patch: Partial<ShowcaseTile>) =>
     touch({ ...m, tiles: m.tiles.map((t, n) => (n === i ? { ...t, ...patch } : t)) });
+  const moveTile = (i: number, dir: -1 | 1) => {
+    const next = [...m.tiles];
+    const j = i + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[i], next[j]] = [next[j], next[i]];
+    touch({ ...m, tiles: next });
+  };
 
   const save = async () => { await saveMerchandising(m); setSaved(true); };
 
@@ -54,7 +70,7 @@ export default function AdminMerchandising() {
         <h2>Feature banner</h2>
         <p className="admin-hint" style={{ marginBottom: 12 }}>
           The “Ready to stand out?” stage on the home page, which snaps between these
-          scenes. Shoot them <b>4:5</b> at <b>1600×2000</b> or larger, and keep the subject
+          scenes in this order — scene 1 is the one on screen when the page loads. Shoot them <b>4:5</b> at <b>1600×2000</b> or larger, and keep the subject
           in the <b>central 50% vertically</b> — desktop crops the same file to 16:10 and
           discards the top and bottom quarters.
         </p>
@@ -64,6 +80,10 @@ export default function AdminMerchandising() {
             <input type="text" value={src} placeholder="/feature-banner.jpg"
               aria-label={`Scene ${i + 1} path`} onChange={(e) => setScene(i, e.target.value)} />
             <div className="admin-img-actions">
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveScene(i, -1)}
+                disabled={i === 0} aria-label={`Move scene ${i + 1} earlier`}>↑</button>
+              <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveScene(i, 1)}
+                disabled={i === m.bannerScenes.length - 1} aria-label={`Move scene ${i + 1} later`}>↓</button>
               <button type="button" className="admin-btn admin-btn--sm admin-btn--danger"
                 onClick={() => removeScene(i)} disabled={m.bannerScenes.length === 1}
                 aria-label={`Remove scene ${i + 1}`}>✕</button>
@@ -113,7 +133,12 @@ export default function AdminMerchandising() {
               <img className="admin-thumb" src={t.image || undefined} alt="" />
               <input type="text" value={t.image} aria-label={`Tile ${i + 1} image`}
                 onChange={(e) => setTile(i, { image: e.target.value })} />
-              <span />
+              <div className="admin-img-actions">
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveTile(i, -1)}
+                  disabled={i === 0} aria-label={`Move tile ${i + 1} earlier`}>↑</button>
+                <button type="button" className="admin-btn admin-btn--sm" onClick={() => moveTile(i, 1)}
+                  disabled={i === m.tiles.length - 1} aria-label={`Move tile ${i + 1} later`}>↓</button>
+              </div>
             </div>
           </div>
         ))}
