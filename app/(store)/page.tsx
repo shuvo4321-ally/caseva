@@ -1215,8 +1215,14 @@ export default function Home() {
 
         {/* ============ VALUE PROP (Olipop frame 1 style) ============ */}
         <section className="value-prop">
-          <Image className="vp-corner vp-bl" src="/pink-floral-case-v2.png" alt="" width={260} height={400} />
-          <Image className="vp-corner vp-br" src="/rose-case-v2.png" alt="" width={260} height={400} />
+          {/* Declared at the files' TRUE intrinsic size. object-fit computes to
+              `fill` here, so a declared ratio that disagrees with the source
+              stretches it — 260x400 (0.650) against these 1587x2245 files
+              (0.707) squashed both corners ~8% too narrow. Quoting the real
+              dimensions means the ratio can never drift from the artwork.
+              CSS still drives the rendered size (.vp-bl/.vp-br set width). */}
+          <Image className="vp-corner vp-bl" src="/blossom.png" alt="" width={1587} height={2245} />
+          <Image className="vp-corner vp-br" src="/blossom.png" alt="" width={1587} height={2245} />
           <div className="container vp-inner">
             <p className="vp-text reveal">
               Our <span className="vp-highlight">stylish</span> and{" "}
