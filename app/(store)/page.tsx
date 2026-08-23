@@ -71,7 +71,7 @@ const heroCases = [
   { src: "/white-rose-fan.png", alt: "White rose floral case", name: "white-rose" },
   { src: "/blue-floral-fan.png", alt: "Blue floral case", name: "blue-floral" },
   { src: "/pink-rose-hero.png", alt: "Pink ditsy rose case", name: "pink-rose" },
-  { src: "/blossom-fan-v2.png", alt: "Pressed blossom case", name: "blossom" },
+  { src: "/blossom-fan.png", alt: "Pressed blossom case", name: "blossom" },
   { src: "/tulip-fan.png", alt: "Tulip pattern case", name: "tulip" },
 ].slice(0, FAN_SLOTS.length);
 
