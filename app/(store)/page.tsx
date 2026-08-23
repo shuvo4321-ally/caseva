@@ -68,8 +68,8 @@ const FAN_SLOTS = [
 // Order runs left to right; index 2 is the large centre case. Keep the list
 // FAN_SLOTS.length long — extra entries are ignored, missing ones leave a gap.
 const heroCases = [
-  { src: "/white-rose-hero.png", alt: "White rose floral case", name: "white-rose" },
-  { src: "/blue-case-hero.png", alt: "Blue blossom floral case", name: "blue-blossom" },
+  { src: "/white-rose-fan.png", alt: "White rose floral case", name: "white-rose" },
+  { src: "/blue-floral-fan.png", alt: "Blue floral case", name: "blue-floral" },
   { src: "/pink-rose-hero.png", alt: "Pink ditsy rose case", name: "pink-rose" },
   { src: "/blossom-fan.png", alt: "Pressed blossom case", name: "blossom" },
   { src: "/tulip-hero.png", alt: "Tulip pattern case", name: "tulip" },
