@@ -23,6 +23,7 @@ import {
   type Product,
   type PhoneBrand,
   type ShowcaseTile,
+  type FilterTag,
 } from "../data/products";
 
 // Bump when the stored shape changes; a mismatch re-seeds rather than trying
@@ -33,6 +34,10 @@ export type Merchandising = {
   promoText: string;
   bannerScenes: string[];
   tiles: ShowcaseTile[];
+  /** The two hands in the cheers section, so they are swappable like any other
+   *  image rather than being the one thing you still have to edit in code. */
+  cheersLeft: string;
+  cheersRight: string;
 };
 
 export type Review = { quote: string; author: string };
@@ -54,6 +59,46 @@ export type SiteCopy = {
   shopTitleAll: string;        // /shop banner when no brand filter is applied
 };
 
+// ---- page layout ----
+// A section carries ORDER and PRESENCE only. Its words live in SiteCopy and its
+// imagery in Merchandising, exactly as before — so the visual editor and the
+// Content tab edit the same underlying fields and can never drift apart.
+export type SectionType =
+  | "hero"
+  | "valueProp"
+  | "cheers"
+  | "featureBanner"
+  | "productRow"
+  | "press";
+
+export type PageSection = {
+  id: string;
+  type: SectionType;
+  enabled: boolean;
+  /** Per-instance overrides, for section types that can appear more than once
+   *  (a second product row pointing at a different collection, say). */
+  props?: { tag?: FilterTag; title?: string; viewAll?: string };
+};
+
+export const SECTION_LABELS: Record<SectionType, string> = {
+  hero: "Hero",
+  valueProp: "Value proposition",
+  cheers: "Cheers hands",
+  featureBanner: "Feature banner",
+  productRow: "Product row",
+  press: "Press quotes",
+};
+
+// The home page as it stands today, in order.
+const SEED_SECTIONS: PageSection[] = [
+  { id: "hero", type: "hero", enabled: true },
+  { id: "valueProp", type: "valueProp", enabled: true },
+  { id: "cheers", type: "cheers", enabled: true },
+  { id: "featureBanner", type: "featureBanner", enabled: true },
+  { id: "productRow", type: "productRow", enabled: true },
+  { id: "press", type: "press", enabled: true },
+];
+
 export type OrderLine = { name: string; model: string; qty: number; price: number };
 export type Order = {
   id: string;
@@ -69,6 +114,7 @@ export type AdminData = {
   phoneBrands: PhoneBrand[];
   merchandising: Merchandising;
   copy: SiteCopy;
+  sections: PageSection[];
   orders: Order[];
 };
 
@@ -78,6 +124,8 @@ const SEED_MERCH: Merchandising = {
   promoText: "Free shipping on orders $30+ · Buy 2, get 1 free",
   bannerScenes: ["/feature-banner.jpg", "/feature-banner-2.jpg", "/feature-banner-3.jpg"],
   tiles: SHOWCASE_TILES,
+  cheersLeft: "/cheers-v3-1.png",
+  cheersRight: "/cheers-v3-2.png",
 };
 
 // Verbatim from the components today, so the editor opens showing exactly what
@@ -133,6 +181,7 @@ const seed = (): AdminData => ({
   phoneBrands: structuredClone(PHONE_BRANDS),
   merchandising: structuredClone(SEED_MERCH),
   copy: structuredClone(SEED_COPY),
+  sections: structuredClone(SEED_SECTIONS),
   orders: structuredClone(SEED_ORDERS),
 });
 
@@ -149,6 +198,7 @@ const read = (): AdminData => {
       phoneBrands: parsed.phoneBrands ?? seed().phoneBrands,
       merchandising: parsed.merchandising ?? seed().merchandising,
       copy: parsed.copy ?? seed().copy,
+      sections: parsed.sections ?? seed().sections,
       orders: parsed.orders ?? seed().orders,
     };
   } catch {
@@ -217,6 +267,16 @@ export const saveCopy = async (copy: SiteCopy): Promise<SiteCopy> => {
   data.copy = copy;
   write(data);
   return copy;
+};
+
+// ---------- page layout ----------
+export const listSections = async (): Promise<PageSection[]> => read().sections;
+
+export const saveSections = async (sections: PageSection[]): Promise<PageSection[]> => {
+  const data = read();
+  data.sections = sections;
+  write(data);
+  return sections;
 };
 
 // ---------- ordering ----------
