@@ -8,10 +8,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
-import {
-  PRODUCTS,
-  MODEL_STORAGE_KEY,
-} from "../data/products";
+import { MODEL_STORAGE_KEY } from "../data/products";
 import CollectionShowcase from "../components/CollectionShowcase";
 import ModelSelector from "../components/ModelSelector";
 
@@ -59,14 +56,24 @@ const FAN_SLOTS = [
   { rotate: 30, x: 200, y: 60 },
 ];
 
-// Hero fan = first five featured products, topped up from the rest of the
-// catalog so the fan never renders short. Reads from the shared catalog.
+// Hero fan — CURATED, not derived from the catalog.
+//
+// It used to map over featured products and take each one's images[0], which
+// tied the hero's art direction to product identity: restyling the fan meant
+// changing a product's primary image, and that image is also its card on
+// /shop, its product page and its cart thumbnail. The fan is decorative
+// (.cases sets pointer-events: none, so nothing here links anywhere), so it
+// should be chosen for how the five look together, independent of the catalog.
+//
+// Order runs left to right; index 2 is the large centre case. Keep the list
+// FAN_SLOTS.length long — extra entries are ignored, missing ones leave a gap.
 const heroCases = [
-  ...PRODUCTS.filter((p) => p.featured),
-  ...PRODUCTS.filter((p) => !p.featured),
-]
-  .slice(0, FAN_SLOTS.length)
-  .map((p) => ({ src: p.images[0], alt: p.alt, name: p.name }));
+  { src: "/white-rose-hero.png", alt: "White rose floral case", name: "white-rose" },
+  { src: "/blue-case-hero.png", alt: "Blue blossom floral case", name: "blue-blossom" },
+  { src: "/blossom.png", alt: "Pressed blossom case", name: "blossom" },
+  { src: "/pink-bow-hero.png", alt: "Pink bow-knot case", name: "pink-bow" },
+  { src: "/tulip-hero.png", alt: "Tulip pattern case", name: "tulip" },
+].slice(0, FAN_SLOTS.length);
 
 const benefits = [
   { icon: "🛡️", label: "Drop Protection" },

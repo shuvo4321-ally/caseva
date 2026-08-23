@@ -755,13 +755,17 @@ input:focus-visible {
   -webkit-touch-callout: none;
 }
 
-.case img {
-  width: 100% !important;
-  height: 100% !important;
+/* `.case` IS the <img> — the hero renders <Image className="case …"> — so the
+   old `.case img` selector matched nothing and object-fit stayed at `fill`.
+   That silently stretched any source that was not 2:3 into the 2:3 slot: the
+   four 1080x1620 packshots were unaffected, but blossom.png (1587x2245, 0.708)
+   came out 5.8% too narrow. `contain` is identical to `fill` for a 2:3 source
+   and simply fits anything else, so the fan no longer dictates the artwork's
+   aspect ratio. */
+.case {
   object-fit: contain;
   object-position: center;
   -webkit-user-drag: none;
-  user-select: none;
   pointer-events: none;
 }
 
