@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import ShopCatalog from "../components/ShopCatalog";
-import { type FilterTag } from "../data/products";
+import ShopCatalog from "../../components/ShopCatalog";
+import { type FilterTag } from "../../data/products";
 
 export const metadata: Metadata = {
   title: "Shop All Cases — CASEVA",

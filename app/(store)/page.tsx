@@ -11,9 +11,9 @@ import { CustomEase } from "gsap/CustomEase";
 import {
   PRODUCTS,
   MODEL_STORAGE_KEY,
-} from "./data/products";
-import CollectionShowcase from "./components/CollectionShowcase";
-import ModelSelector from "./components/ModelSelector";
+} from "../data/products";
+import CollectionShowcase from "../components/CollectionShowcase";
+import ModelSelector from "../components/ModelSelector";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
 

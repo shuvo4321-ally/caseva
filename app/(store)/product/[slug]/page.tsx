@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ProductDetail from "../../components/ProductDetail";
-import { PRODUCTS, getProduct } from "../../data/products";
+import ProductDetail from "../../../components/ProductDetail";
+import { PRODUCTS, getProduct } from "../../../data/products";
 
 export function generateStaticParams() {
   return PRODUCTS.map((p) => ({ slug: p.slug }));

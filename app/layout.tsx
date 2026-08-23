@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
-import { CartProvider } from "./cart-context";
-import PromoBar from "./components/PromoBar";
-import Nav from "./components/Nav";
-import Footer from "./components/Footer";
-import CartDrawer from "./components/CartDrawer";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -40,6 +35,9 @@ export const viewport = {
   themeColor: "#fff9d6",
 };
 
+// Shell only — html, body, fonts, globals. The storefront's chrome (promo bar,
+// nav, footer, cart drawer) lives in app/(store)/layout.tsx so that /admin,
+// which is outside that group, does not inherit it.
 export default function RootLayout({
   children,
 }: {
@@ -47,16 +45,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${fraunces.variable}`} suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <CartProvider>
-          <a href="#main" className="skip-link">Skip to content</a>
-          <PromoBar />
-          <Nav />
-          {children}
-          <Footer />
-          <CartDrawer />
-        </CartProvider>
-      </body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

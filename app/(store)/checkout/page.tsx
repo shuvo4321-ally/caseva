@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useCart } from "../cart-context";
-import { formatPrice } from "../data/products";
+import { useCart } from "../../cart-context";
+import { formatPrice } from "../../data/products";
 
 const SHIPPING_FLAT = 60; // ৳/$ flat rate placeholder until real rates wire in
 

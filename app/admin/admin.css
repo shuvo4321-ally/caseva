@@ -1,0 +1,325 @@
+/* ===== ADMIN — scoped to /admin =====
+   Everything here is namespaced under .admin so it can never reach the store.
+   Deliberately plain: this is a tool, not the brand surface. Neutral greys,
+   one accent (the brand blue), no serif display face. */
+
+.admin {
+  --ad-bg: #f4f5f7;
+  --ad-panel: #ffffff;
+  --ad-line: #e2e5ea;
+  --ad-text: #14161a;
+  --ad-dim: #5c6270;
+  --ad-accent: #2540ad;
+  --ad-danger: #b3261e;
+  --ad-warn: #8a6100;
+  --ad-warn-bg: #fff6e0;
+  --ad-danger-bg: #fdeceb;
+
+  min-height: 100dvh;
+  background: var(--ad-bg);
+  color: var(--ad-text);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.admin *,
+.admin *::before,
+.admin *::after { box-sizing: border-box; }
+
+/* ---------- shell ---------- */
+.admin-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--ad-panel);
+  border-bottom: 1px solid var(--ad-line);
+}
+
+.admin-brand {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  color: var(--ad-text);
+}
+.admin-brand span { color: var(--ad-accent); }
+
+.admin-back {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--ad-dim);
+  text-decoration: none;
+  padding: 8px 0;
+}
+.admin-back:hover { color: var(--ad-accent); }
+
+/* Nav is a horizontal scroller on a phone and a normal row on a laptop —
+   a wrapping row pushed the content below the fold on a 412px screen. */
+.admin-nav {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--ad-panel);
+  border-bottom: 1px solid var(--ad-line);
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 53px;
+  z-index: 19;
+}
+.admin-nav::-webkit-scrollbar { display: none; }
+
+.admin-nav a {
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ad-dim);
+  text-decoration: none;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+}
+.admin-nav a:hover { background: #eef0f4; color: var(--ad-text); }
+.admin-nav a[aria-current="page"] { background: var(--ad-accent); color: #fff; }
+
+.admin-main { padding: 18px 16px 64px; max-width: 1080px; margin: 0 auto; }
+
+/* ---------- typography ---------- */
+.admin h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
+.admin h2 { font-size: 16px; font-weight: 700; margin: 0 0 12px; }
+.admin-sub { color: var(--ad-dim); font-size: 14px; margin: 0 0 20px; }
+
+/* ---------- panels ---------- */
+.admin-panel {
+  background: var(--ad-panel);
+  border: 1px solid var(--ad-line);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.admin-note {
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+}
+.admin-note--warn { background: var(--ad-warn-bg); border-color: #f0dcae; color: var(--ad-warn); }
+.admin-note--info { background: #eef1fb; border-color: #d3dbf5; color: #24336b; }
+
+/* ---------- stats ---------- */
+.admin-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+.admin-stat {
+  background: var(--ad-panel);
+  border: 1px solid var(--ad-line);
+  border-radius: 12px;
+  padding: 14px;
+}
+.admin-stat b { display: block; font-size: 26px; font-weight: 800; line-height: 1.1; }
+.admin-stat span { font-size: 13px; color: var(--ad-dim); }
+
+/* ---------- forms ---------- */
+.admin-field { margin-bottom: 16px; }
+.admin-field > label,
+.admin-legend {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.admin-hint { font-size: 12.5px; color: var(--ad-dim); margin: 6px 0 0; }
+
+.admin input[type="text"],
+.admin input[type="number"],
+.admin textarea,
+.admin select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--ad-line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ad-text);
+  font: inherit;
+  /* 16px stops iOS Safari zooming the page when a field is focused */
+  font-size: 16px;
+}
+.admin textarea { min-height: 96px; resize: vertical; }
+
+.admin input:focus-visible,
+.admin textarea:focus-visible,
+.admin select:focus-visible,
+.admin button:focus-visible,
+.admin a:focus-visible {
+  outline: 2px solid var(--ad-accent);
+  outline-offset: 2px;
+}
+
+.admin input[aria-invalid="true"] { border-color: var(--ad-danger); }
+
+.admin-row { display: grid; gap: 12px; }
+@media (min-width: 680px) {
+  .admin-row--2 { grid-template-columns: 1fr 1fr; }
+  .admin-stats { grid-template-columns: repeat(4, 1fr); }
+}
+
+.admin-check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  min-height: 40px;
+  cursor: pointer;
+}
+.admin-check input { width: 18px; height: 18px; accent-color: var(--ad-accent); }
+
+.admin-checkgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+  gap: 2px 12px;
+}
+
+/* ---------- buttons ---------- */
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  border: 1px solid var(--ad-line);
+  background: #fff;
+  color: var(--ad-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+.admin-btn:hover { background: #f2f4f8; }
+.admin-btn--primary { background: var(--ad-accent); border-color: var(--ad-accent); color: #fff; }
+.admin-btn--primary:hover { background: #1c3280; }
+.admin-btn--danger { color: var(--ad-danger); border-color: #eccbc8; }
+.admin-btn--danger:hover { background: var(--ad-danger-bg); }
+.admin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.admin-btn--sm { min-height: 36px; padding: 6px 11px; font-size: 13px; }
+
+.admin-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Sticky save bar: on a phone the form is long and the save button would
+   otherwise sit hundreds of pixels below the field being edited. */
+.admin-save {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 0;
+  margin-top: 20px;
+  background: linear-gradient(to top, var(--ad-bg) 72%, transparent);
+}
+
+/* ---------- issues ---------- */
+.admin-issues { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+.admin-issue {
+  display: flex;
+  gap: 9px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  border: 1px solid transparent;
+}
+.admin-issue--error { background: var(--ad-danger-bg); border-color: #f0cdc9; color: var(--ad-danger); }
+.admin-issue--warning { background: var(--ad-warn-bg); border-color: #f0dcae; color: var(--ad-warn); }
+.admin-issue b { flex: 0 0 auto; }
+
+/* ---------- product list ---------- */
+.admin-list { display: grid; gap: 10px; }
+
+.admin-item {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 12px;
+  align-items: center;
+  background: var(--ad-panel);
+  border: 1px solid var(--ad-line);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.admin-thumb {
+  width: 56px;
+  height: 70px;
+  border-radius: 8px;
+  background: #eef0f4;
+  object-fit: contain;
+  display: block;
+}
+
+.admin-item-name { font-weight: 700; font-size: 15px; }
+.admin-item-meta { font-size: 12.5px; color: var(--ad-dim); margin-top: 2px; }
+.admin-item-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+
+.admin-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #eef0f4;
+  color: var(--ad-dim);
+  margin-right: 4px;
+}
+.admin-tag--new { background: #e3f2e6; color: #1c6b2d; }
+.admin-tag--sale { background: #fde8ef; color: #a01346; }
+
+/* ---------- gallery rows ---------- */
+.admin-img-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.admin-img-row .admin-thumb { width: 48px; height: 60px; }
+.admin-img-row input { font-size: 14px; }
+.admin-img-actions { display: flex; gap: 4px; }
+
+/* ---------- orders ---------- */
+.admin-order { border-bottom: 1px solid var(--ad-line); padding: 12px 0; }
+.admin-order:last-child { border-bottom: 0; }
+.admin-order-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.admin-order-id { font-weight: 700; }
+.admin-order-line { font-size: 13px; color: var(--ad-dim); }
+
+.admin-status {
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.admin-status--paid { background: #e3f2e6; color: #1c6b2d; }
+.admin-status--pending { background: var(--ad-warn-bg); color: var(--ad-warn); }
+.admin-status--shipped { background: #e6edfb; color: #24336b; }
+.admin-status--refunded { background: #eef0f4; color: var(--ad-dim); }
+
+/* ---------- export ---------- */
+.admin-code {
+  width: 100%;
+  min-height: 220px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre;
+  overflow: auto;
+}
+
+.admin-empty { color: var(--ad-dim); font-size: 14px; padding: 24px 0; text-align: center; }
