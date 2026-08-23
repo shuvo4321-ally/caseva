@@ -3512,11 +3512,18 @@ input:focus-visible {
     z-index: 2;
   }
 
+  /* Deliberately NOT the mirror of .case-fan-0. The fan is symmetric by
+     design, but on a phone slot 1 is half off the left edge, so the only
+     small outer case you actually SEE is this one — which made it read as
+     dwarfed and detached from the case beside it. Matching slot 4's box and
+     pulling it 18px left closes that gap and evens out what is on screen.
+     Rotation is left at the base 30deg: page.tsx re-applies it from
+     data-rotate, so a CSS override here would not survive. */
   .case-fan-4 {
-    width: 150px;
-    height: 225px;
-    left: calc(50% + 26px);
-    top: 60px;
+    width: 168px;
+    height: 252px;
+    left: calc(50% + 8px);
+    top: 40px;
     z-index: 1;
   }
 
