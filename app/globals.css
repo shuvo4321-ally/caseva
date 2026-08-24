@@ -3480,10 +3480,14 @@ input:focus-visible {
     align-self: center;
   }
 
+  /* -176px cut 30px off the leading case's camera module — 70% of it visible,
+     which read as the cutout being chopped rather than cropped. -158px leaves
+     only 12px off screen (88% visible), enough to show the cutout without
+     giving up the bleed that makes the fan feel wider than the viewport. */
   .case-fan-0 {
     width: 150px;
     height: 225px;
-    left: calc(50% - 176px);
+    left: calc(50% - 158px);
     top: 60px;
     z-index: 1;
   }
