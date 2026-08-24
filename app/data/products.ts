@@ -50,7 +50,7 @@ export const PRODUCTS: Product[] = [
     name: "Rose Whisper",
     price: 32,
     salePrice: 27,
-    images: ["/white-rose-hero.png", "/rose-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner.jpg"],
+    images: ["/rose-fan.png", "/rose-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner.jpg"],
     alt: "White rose floral case",
     description:
       "Soft ivory scattered with hand-drawn roses. A quiet, romantic everyday case with full drop protection and raised camera guards.",
@@ -67,7 +67,7 @@ export const PRODUCTS: Product[] = [
     ],
     name: "Blue Blossom",
     price: 34,
-    images: ["/blue-case-hero.png", "/cream-floral-case-v2.png", "/rose-case-v2.png", "/feature-banner-2.jpg"],
+    images: ["/blue-floral-fan.png", "/cream-floral-case-v2.png", "/rose-case-v2.png", "/feature-banner-2.jpg"],
     alt: "Blue blossom floral case",
     description:
       "A cool-toned porcelain-blue case scattered with delicate silver blossoms. Impact-tested corners, MagSafe-ready, and slim enough to disappear in your pocket.",
@@ -82,7 +82,7 @@ export const PRODUCTS: Product[] = [
     fitsModels: ["iPhone 16 Pro", "iPhone 15 Pro", "Pixel 9 Pro", "Pixel 8"],
     name: "Pink Bloom",
     price: 32,
-    images: ["/pink-case-hero.png", "/pink-floral-case-v2.png", "/rose-case-v2.png", "/feature-banner-3.jpg"],
+    images: ["/pink-rose-hero.png", "/pink-floral-case-v2.png", "/rose-case-v2.png", "/feature-banner-3.jpg"],
     alt: "Pink blossom floral case",
     description:
       "Blush pink strewn with tiny blooms — our most-loved signature print. Grippy matte edges, MagSafe-ready, 100% recycled shell.",
@@ -96,7 +96,7 @@ export const PRODUCTS: Product[] = [
     fitsModels: ["Pixel 9 Pro XL", "Pixel 9 Pro", "Pixel 9", "Pixel 8 Pro", "Pixel 8"],
     name: "Pink Bow",
     price: 34,
-    images: ["/pink-bow-hero.png", "/pink-floral-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner.jpg"],
+    images: ["/pink-bow-fan.png", "/pink-floral-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner.jpg"],
     alt: "Pink bow-knot case",
     description:
       "Coquette-core bow-knots on a glossy pink base. A little playful, a lot protective — impact-tested to 3 m.",
@@ -106,10 +106,25 @@ export const PRODUCTS: Product[] = [
     collections: ["new-arrivals", "featured", "magsafe"],
   },
   {
+    slug: "pressed-blossom",
+    name: "Pressed Blossom",
+    price: 36,
+    images: ["/blossom-fan.png", "/cream-floral-case-v2.png", "/rose-case-v2.png", "/feature-banner-3.jpg"],
+    alt: "Pressed blossom case",
+    description:
+      "A single pressed anemone set under glass on a warm ivory shell. Quieter than a print and no two alike, with impact-tested corners and raised camera guards.",
+    isNew: true,
+    featured: true,
+    caseType: "Clear Case",
+    // PLACEHOLDER compatibility — replace with real fitment.
+    fitsModels: ["iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 15 Pro", "Pixel 9 Pro", "Pixel 9"],
+    collections: ["new-arrivals", "featured", "florals"],
+  },
+  {
     slug: "tulip-garden",
     name: "Tulip Garden",
     price: 32,
-    images: ["/tulip-hero.png", "/tulip-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner-2.jpg"],
+    images: ["/tulip-fan.png", "/tulip-case-v2.png", "/cream-floral-case-v2.png", "/feature-banner-2.jpg"],
     alt: "Tulip pattern case",
     description:
       "A cream case with a scattered watercolour tulip garden. Warm, vintage and slim, with raised bezels that keep your screen off the table.",
