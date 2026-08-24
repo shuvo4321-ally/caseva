@@ -215,10 +215,10 @@ export type ShowcaseTile = {
 };
 
 export const SHOWCASE_TILES: ShowcaseTile[] = [
-  { tag: "new-arrivals", label: "New In", blurb: "Fresh drops", accent: "blue", image: "/pink-bow-hero.png" },
-  { tag: "sale", label: "On Sale", blurb: "Limited-time prices", accent: "pink", image: "/white-rose-hero.png" },
-  { tag: "bestsellers", label: "Best Sellers", blurb: "Most loved", accent: "cream", image: "/pink-case-hero.png" },
-  { tag: "all", label: "Shop All", blurb: "The full range", accent: "lavender", image: "/blue-case-hero.png" },
+  { tag: "new-arrivals", label: "New In", blurb: "Fresh drops", accent: "blue", image: "/pink-bow-fan.png" },
+  { tag: "sale", label: "On Sale", blurb: "Limited-time prices", accent: "pink", image: "/rose-fan.png" },
+  { tag: "bestsellers", label: "Best Sellers", blurb: "Most loved", accent: "cream", image: "/pink-rose-hero.png" },
+  { tag: "all", label: "Shop All", blurb: "The full range", accent: "lavender", image: "/blue-floral-fan.png" },
 ];
 
 // Products for a given filter (grid).
