@@ -36,8 +36,8 @@ export const viewport = {
 };
 
 // Shell only — html, body, fonts, globals. The storefront's chrome (promo bar,
-// nav, footer, cart drawer) lives in app/(store)/layout.tsx so that /admin,
-// which is outside that group, does not inherit it.
+// nav, footer, cart drawer) lives in app/(store)/layout.tsx, so a route added
+// outside that group renders on the bare shell.
 export default function RootLayout({
   children,
 }: {
