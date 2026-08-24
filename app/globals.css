@@ -3742,6 +3742,8 @@ input:focus-visible {
 .search-overlay {
   position: fixed;
   inset: 0;
+  /* Same reason as .fs-overlay: plain inset:0 leaves a strip of page showing
+     while the mobile browser UI collapses. */
   height: 100dvh;
   z-index: 140;
   display: flex;
@@ -3758,7 +3760,7 @@ input:focus-visible {
   max-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: #fff9d6;
+  background: var(--page-ground);
   border-radius: 0 0 20px 20px;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
   overflow: hidden;
