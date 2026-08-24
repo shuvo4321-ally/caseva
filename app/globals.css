@@ -213,7 +213,10 @@ input:focus-visible {
   right: 0;
   display: flex;
   flex-direction: column;
-  background: #fff9d6;
+  /* Follows the page, not the brand cream: the panel drops out of the nav bar
+     and reads as one continuous surface with it, so a fixed colour puts a hard
+     seam across the header on any page that is not cream (the PDP neutral). */
+  background: var(--page-ground);
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.25s ease;
