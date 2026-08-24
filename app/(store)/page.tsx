@@ -72,7 +72,7 @@ const heroCases = [
   { src: "/tulip-fan.png", alt: "Tulip pattern case", name: "tulip" },
   { src: "/pink-rose-hero.png", alt: "Pink ditsy rose case", name: "pink-rose" },
   { src: "/pink-bow-fan.png", alt: "Pink bow-knot case", name: "pink-bow" },
-  { src: "/white-rose-fan.png", alt: "White rose floral case", name: "white-rose" },
+  { src: "/rose-fan.png", alt: "White rose floral case", name: "white-rose" },
 ].slice(0, FAN_SLOTS.length);
 
 const benefits = [
